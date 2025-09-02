@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thời Khóa Biểu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #f8fafc;
+        }
+        .card-effect {
+            background: white;
+            border: 1px solid #e2e8f0;
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hover-scale {
+            transition: transform 0.2s ease-in-out;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-6 py-12 max-w-7xl">
+        <!-- Header -->
+        <div class="text-center mb-16">
+            <h1 class="text-5xl font-bold text-gray-800 mb-2">Thời Khóa Biểu</h1>
+            <h2 class="text-3xl font-semibold gradient-text mb-4">Trường THPT Nguyễn Khuyến</h2>
+            <p class="text-lg text-gray-600 font-light">Áp dụng từ ngày 8/9/2025</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid lg:grid-cols-2 gap-8 mb-12 max-w-4xl mx-auto">
+            <!-- Controls -->
+            <div class="card-effect rounded-2xl p-6 card-shadow">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">🎯 Chọn xem thời khóa biểu</h2>
+                
+                <!-- Class Selection -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">📚 Xem theo lớp học</label>
+                    <select id="classSelect" class="w-full p-3 bg-white border border-gray-300 rounded-xl text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">-- Chọn lớp --</option>
+                    </select>
+                </div>
+
+                <!-- Teacher Selection -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">👨‍🏫 Xem theo giáo viên</label>
+                    <select id="teacherSelect" class="w-full p-3 bg-white border border-gray-300 rounded-xl text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">-- Chọn giáo viên --</option>
+                    </select>
+                </div>
+
+                <!-- Display Mode Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">📱 Chế độ hiển thị</label>
+                    <div class="bg-gray-100 rounded-xl p-1">
+                        <button id="fullModeBtn" class="w-1/2 py-2 px-3 rounded-lg bg-blue-500 text-white font-medium transition-all text-sm">
+                            Đầy đủ
+                        </button>
+                        <button id="compactModeBtn" class="w-1/2 py-2 px-3 rounded-lg text-gray-600 font-medium transition-all hover:bg-gray-200 text-sm">
+                            Rút gọn
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Upload & Info -->
+            <div class="card-effect rounded-2xl p-6 card-shadow">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">📁 Tải file dữ liệu</h2>
+                <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-blue-400 transition-colors mb-4">
+                    <input type="file" id="csvFile" accept=".csv" class="hidden">
+                    <label for="csvFile" class="cursor-pointer block">
+                        <div class="w-12 h-12 mx-auto mb-2 bg-blue-50 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                        </div>
+                        <p class="text-gray-800 font-medium text-sm mb-1">Chọn file CSV</p>
+                        <p class="text-gray-500 text-xs">hoặc kéo thả vào đây</p>
+                    </label>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-3">
+                    <p class="text-gray-800 text-xs font-medium mb-1">Định dạng: sang2,1,10A1,Toán,Cô Lan,101</p>
+                    <p class="text-gray-600 text-xs">Buổi, Tiết, Lớp, Môn học, Giáo viên, Phòng</p>
+                </div>
+                <div id="loadingStatus" class="mt-3 text-center">
+                    <div class="inline-flex items-center text-blue-600 text-sm">
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Đang tải dữ liệu từ Google Drive...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Display -->
+        <div id="scheduleContainer" class="card-effect rounded-2xl p-6 card-shadow hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">
+                    📅 <span id="selectedItem" class="gradient-text"></span>
+                </h2>
+            </div>
+            
+            <div class="overflow-hidden rounded-xl border border-gray-200">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="p-3 text-left font-semibold text-gray-800 border-r border-gray-200">Tiết</th>
+                            <th class="p-3 text-center font-semibold text-gray-800 border-r border-gray-200">Thứ 2</th>
+                            <th class="p-3 text-center font-semibold text-gray-800 border-r border-gray-200">Thứ 3</th>
+                            <th class="p-3 text-center font-semibold text-gray-800 border-r border-gray-200">Thứ 4</th>
+                            <th class="p-3 text-center font-semibold text-gray-800 border-r border-gray-200">Thứ 5</th>
+                            <th class="p-3 text-center font-semibold text-gray-800 border-r border-gray-200">Thứ 6</th>
+                            <th class="p-3 text-center font-semibold text-gray-800">Thứ 7</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleTable">
+                        <!-- Schedule will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let scheduleData = [];
+        let classes = new Set();
+        let teachers = new Set();
+        let currentMode = 'class';
+        let displayMode = 'full'; // 'full' or 'compact'
+
+        // Sample data from the provided file
+        const sampleData = [
+           ['chieu2', '1', '10A1', 'TIN', 'C. PHỤNG', 'PM1'],
+    ['chieu2', '2', '10A1', 'TIN', 'C. PHỤNG', 'PM1'],
+    ['chieu2', '3', '10A1', 'GDĐP', 'T. NAM', 'nan'],
+    ['chieu2', '4', '10A1', 'TNHN-1', 'T. ÂN', 'nan'],
+    ['chieu2', '5', '10A1', 'CC', 'T. ÂN', 'nan'],
+    ['chieu3', '1', '10A1', 'ANH', 'C. THÁI', 'nan'],
+    ['chieu3', '2', '10A1', 'SINH', 'T. T-PHÁT', 'nan'],
+    ['chieu3', '3', '10A1', 'HOÁ', 'C. NGÂN (H)', 'nan'],
+    ['chieu3', '4', '10A1', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['chieu3', '5', '10A1', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['chieu4', '1', '10A1', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['chieu4', '2', '10A1', 'MOS', 'C. PHỤNG', 'PM3'],
+    ['chieu4', '3', '10A1', 'MOS', 'C. PHỤNG', 'PM3'],
+    ['chieu4', '4', '10A1', 'GDQP', 'T. DŨNG', 'nan'],
+    ['chieu4', '5', '10A1', 'SINH', 'T. T-PHÁT', 'nan'],
+    ['chieu5', '1', '10A1', 'LÝ', 'T. ÂN', 'nan'],
+    ['chieu5', '2', '10A1', 'ANH', 'C. THÁI', 'nan'],
+    ['chieu5', '3', '10A1', 'ANH', 'C. THÁI', 'nan'],
+    ['chieu5', '4', '10A1', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['chieu5', '5', '10A1', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['chieu6', '1', '10A1', 'HOÁ', 'C. NGÂN (H)', 'nan'],
+    ['chieu6', '2', '10A1', 'HOÁ', 'C. NGÂN (H)', 'nan'],
+    ['chieu6', '3', '10A1', 'TNHN', 'T. ÂN', 'nan'],
+    ['chieu6', '4', '10A1', 'TNHN', 'T. ÂN', 'nan'],
+    ['chieu6', '5', '10A1', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['sang2', '1', '10A1', 'LÝ', 'T. ÂN', 'nan'],
+    ['sang2', '2', '10A1', 'LÝ', 'T. ÂN', 'nan'],
+    ['sang3', '1', '10A1', 'AVBN', 'AVBN1', 'nan'],
+    ['sang3', '2', '10A1', 'AVBN', 'AVBN1', 'nan'],
+    ['sang5', '1', '10A1', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['sang5', '2', '10A1', 'SỬ', 'C. NÊ', 'nan'],
+    ['chieu2', '1', '10A2', 'VĂN', 'C. NGỌC', 'nan'],
+    ['chieu2', '2', '10A2', 'VĂN', 'C. NGỌC', 'nan'],
+    ['chieu2', '3', '10A2', 'TOÁN', 'T. THU', 'nan'],
+    ['chieu2', '4', '10A2', 'TNHN-1', 'T. THU', 'nan'],
+    ['chieu2', '5', '10A2', 'CC', 'T. THU', 'nan'],
+    ['chieu3', '1', '10A2', 'TNHN', 'T. TÚ', 'nan'],
+    ['chieu3', '2', '10A2', 'TNHN', 'T. TÚ', 'nan'],
+    ['chieu3', '3', '10A2', 'VĂN', 'C. NGỌC', 'nan'],
+    ['chieu3', '4', '10A2', 'HOÁ', 'C. HIẾN', 'nan'],
+    ['chieu3', '5', '10A2', 'SINH', 'C. HOA (S)', 'nan'],
+    ['chieu4', '1', '10A2', 'TOÁN', 'T. THU', 'nan'],
+    ['chieu4', '2', '10A2', 'TOÁN', 'T. THU', 'nan'],
+    ['chieu4', '3', '10A2', 'GDQP', 'T. DŨNG', 'nan'],
+    ['chieu4', '4', '10A2', 'MOS', 'C. PHỤNG', 'PM3'],
+    ['chieu4', '5', '10A2', 'MOS', 'C. PHỤNG', 'PM3'],
+    ['chieu5', '1', '10A2', 'LÝ', 'T. TÚ', 'nan'],
+    ['chieu5', '2', '10A2', 'HOÁ', 'C. HIẾN', 'nan'],
+    ['chieu5', '3', '10A2', 'HOÁ', 'C. HIẾN', 'nan'],
+    ['chieu5', '4', '10A2', 'GDĐP', 'T. THANH', 'nan'],
+    ['chieu5', '5', '10A2', 'TOÁN', 'T. THU', 'nan'],
+    ['chieu6', '1', '10A2', 'SỬ', 'C. HỒNG (S)', 'nan'],
+    ['chieu6', '2', '10A2', 'LÝ', 'T. TÚ', 'nan'],
+    ['chieu6', '3', '10A2', 'LÝ', 'T. TÚ', 'nan'],
+    ['chieu6', '4', '10A2', 'TIN', 'C. PHỤNG', 'PM3'],
+    ['chieu6', '5', '10A2', 'TIN', 'C. PHỤNG', 'PM3'],
+    ['sang2', '1', '10A2', 'AVBN', 'AVBN1', 'nan'],
+    ['sang2', '2', '10A2', 'AVBN', 'AVBN1', 'nan'],
+    ['sang3', '1', '10A2', 'ANH', 'C. KHOA', 'nan'],
+    ['sang3', '2', '10A2', 'ANH', 'C. KHOA', 'nan'],
+    ['sang5', '1', '10A2', 'ANH', 'C. KHOA', 'nan'],
+    ['sang5', '2', '10A2', 'SINH', 'C. HOA (S)', 'nan'],
+    ['chieu2', '1', '10A3', 'HOÁ', 'T. LUÂN', 'nan'],
+    ['chieu2', '2', '10A3', 'HOÁ', 'T. LUÂN', 'nan'],
+    ['chieu2', '3', '10A3', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['chieu2', '4', '10A3', 'TNHN-1', 'C. UYÊN (L)', 'nan'],
+    ['chieu2', '5', '10A3', 'CC', 'C. UYÊN (L)', 'nan'],
+    ['chieu3', '1', '10A3', 'HOÁ', 'T. LUÂN', 'nan'],
+    ['chieu3', '2', '10A3', 'VĂN', 'C. GIANG', 'nan'],
+    ['chieu3', '3', '10A3', 'VĂN', 'C. GIANG', 'nan'],
+    ['chieu3', '4', '10A3', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['chieu3', '5', '10A3', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['chieu4', '1', '10A3', 'TOÁN', 'C. THÚY', 'nan'],
+    ['chieu4', '2', '10A3', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['chieu4', '3', '10A3', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['chieu4', '4', '10A3', 'AVBN', 'AVBN1', 'nan'],
+    ['chieu4', '5', '10A3', 'AVBN', 'AVBN1', 'nan'],
+    ['chieu5', '1', '10A3', 'TIN', 'T. HẢO', 'PM4'],
+    ['chieu5', '2', '10A3', 'TIN', 'T. HẢO', 'PM4'],
+    ['chieu5', '3', '10A3', 'TOÁN', 'C. THÚY', 'nan'],
+    ['chieu5', '4', '10A3', 'VĂN', 'C. GIANG', 'nan'],
+    ['chieu5', '5', '10A3', 'ĐỊA', 'C. LÝ', 'nan'],
+    ['chieu6', '1', '10A3', 'LÝ', 'C. UYÊN (L)', 'nan'],
+    ['chieu6', '2', '10A3', 'ĐỊA', 'C. LÝ', 'nan'],
+    ['chieu6', '3', '10A3', 'TNHN', 'C. UYÊN (L)', 'nan'],
+    ['chieu6', '4', '10A3', 'TNHN', 'C. UYÊN (L)', 'nan'],
+    ['chieu6', '5', '10A3', 'GDĐP', 'T. NAM', 'nan'],
+    ['sang2', '1', '10A3', 'TOÁN', 'C. THÚY', 'nan'],
+    ['sang2', '2', '10A3', 'TOÁN', 'C. THÚY', 'nan'],
+    ['sang3', '1', '10A3', 'LÝ', 'C. UYÊN (L)', 'nan'],
+    ['sang3', '2', '10A3', 'LÝ', 'C. UYÊN (L)', 'nan'],
+    ['sang5', '1', '10A3', 'MOS', 'T. HẢO', 'PM2'],
+    ['sang5', '2', '10A3', 'MOS', 'T. HẢO', 'PM2'],
+    ['chieu2', '1', '10A4', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['chieu2', '2', '10A4', 'GDĐP', 'T. NAM', 'nan'],
+    ['chieu2', '3', '10A4', 'HOÁ', 'T. VĂN', 'nan'],
+    ['chieu2', '4', '10A4', 'TNHN-1', 'C. HUYỀN', 'nan'],
+    ['chieu2', '5', '10A4', 'CC', 'C. HUYỀN', 'nan'],
+    ['chieu3', '1', '10A4', 'HOÁ', 'T. VĂN', 'nan'],
+    ['chieu3', '2', '10A4', 'HOÁ', 'T. VĂN', 'nan'],
+    ['chieu3', '3', '10A4', 'VĂN', 'C. THẢO', 'nan'],
+    ['chieu3', '4', '10A4', 'TNHN', 'T. TÚ', 'nan'],
+    ['chieu3', '5', '10A4', 'TNHN', 'T. TÚ', 'nan'],
+    ['chieu4', '1', '10A4', 'AVBN', 'AVBN1', 'nan'],
+    ['chieu4', '2', '10A4', 'AVBN', 'AVBN1', 'nan'],
+    ['chieu4', '3', '10A4', 'ĐỊA', 'T. NAM', 'nan'],
+    ['chieu4', '4', '10A4', 'TIN', 'T. HẢO', 'PM4'],
+    ['chieu4', '5', '10A4', 'TIN', 'T. HẢO', 'PM4'],
+    ['chieu5', '1', '10A4', 'LÝ', 'C. TRÂM', 'nan'],
+    ['chieu5', '2', '10A4', 'LÝ', 'C. TRÂM', 'nan'],
+    ['chieu5', '3', '10A4', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['chieu5', '4', '10A4', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['chieu5', '5', '10A4', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['chieu6', '1', '10A4', 'ĐỊA', 'T. NAM', 'nan'],
+    ['chieu6', '2', '10A4', 'SỬ', 'T. TẤN (S)', 'nan'],
+    ['chieu6', '3', '10A4', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['chieu6', '4', '10A4', 'MOS', 'T. HẢO', 'PM4'],
+    ['chieu6', '5', '10A4', 'MOS', 'T. HẢO', 'PM4'],
+    ['sang2', '1', '10A4', 'VĂN', 'C. THẢO', 'nan'],
+    ['sang2', '2', '10A4', 'VĂN', 'C. THẢO', 'nan'],
+    ['sang3', '1', '10A4', 'ANH', 'C. TÚ', 'nan'],
+    ['sang3', '2', '10A4', 'LÝ', 'C. TRÂM', 'nan'],
+    ['sang5', '1', '10A4', 'ANH', 'C. TÚ', 'nan'],
+    ['sang5', '2', '10A4', 'ANH', 'C. TÚ', 'nan'],
+    ['chieu2', '1', '10A5', 'LÝ', 'C. GIANG (L)', 'nan'],
+    ['chieu2', '2', '10A5', 'LÝ', 'C. GIANG (L)', 'nan'],
+    ['chieu2', '3', '10A5', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['chieu2', '4', '10A5', 'TNHN-1', 'C. GIANG (L)', 'nan'],
+    ['chieu2', '5', '10A5', 'CC', 'C. GIANG (L)', 'nan'],
+    ['chieu3', '1', '10A5', 'MOS', 'T. HẢO', 'PM3'],
+    ['chieu3', '2', '10A5', 'MOS', 'T. HẢO', 'PM3'],
+    ['chieu3', '3', '10A5', 'LÝ', 'C. GIANG (L)', 'nan'],
+    ['chieu3', '4', '10A5', 'TNHN', 'C. GIANG (L)', 'nan'],
+    ['chieu3', '5', '10A5', 'TNHN', 'C. GIANG (L)', 'nan'],
+    ['chieu4', '1', '10A5', 'ANH', 'C. XUÂN', 'nan'],
+    ['chieu4', '2', '10A5', 'ANH', 'C. XUÂN', 'nan'],
+    ['chieu4', '3', '10A5', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['chieu4', '4', '10A5', 'ĐỊA', 'C. HƯƠNG (Đ)', 'nan'],
+    ['chieu4', '5', '10A5', 'GDĐP', 'T. NAM', 'nan'],
+    ['chieu5', '1', '10A5', 'ANH', 'C. XUÂN', 'nan'],
+    ['chieu5', '2', '10A5', 'VĂN', 'C. NGỌC', 'nan'],
+    ['chieu5', '3', '10A5', 'HOÁ', 'T. TOÀN', 'nan'],
+    ['chieu5', '4', '10A5', 'TIN', 'T. HẢO', 'PM4'],
+    ['chieu5', '5', '10A5', 'TIN', 'T. HẢO', 'PM4'],
+    ['chieu6', '1', '10A5', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['chieu6', '2', '10A5', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['chieu6', '3', '10A5', 'ĐỊA', 'C. HƯƠNG (Đ)', 'nan'],
+    ['chieu6', '4', '10A5', 'SỬ', 'C. HỒNG (S)', 'nan'],
+    ['chieu6', '5', '10A5', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['sang2', '1', '10A5', 'HOÁ', 'T. TOÀN', 'nan'],
+    ['sang2', '2', '10A5', 'HOÁ', 'T. TOÀN', 'nan'],
+    ['sang3', '1', '10A5', 'VĂN', 'C. NGỌC', 'nan'],
+    ['sang3', '2', '10A5', 'VĂN', 'C. NGỌC', 'nan'],
+    ['sang5', '1', '10A5', 'AVBN', 'AVBN1', 'nan'],
+    ['sang5', '2', '10A5', 'AVBN', 'AVBN1', 'nan'],
+    ['chieu2', '1', '10A6', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['chieu2', '2', '10A6', 'ANH', 'C. OANH', 'nan'],
+    ['chieu2', '3', '10A6', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['chieu2', '4', '10A6', 'TNHN-1', 'C. HẠNH (S)', 'nan'],
+    ['chieu2', '5', '10A6', 'CC', 'C. HẠNH (S)', 'nan'],
+    ['chieu3', '1', '10A6', 'ANH', 'C. OANH', 'nan'],
+    ['chieu3', '2', '10A6', 'ANH', 'C. OANH', 'nan'],
+    ['chieu3', '3', '10A6', 'HOÁ', 'C. TRANG (H)', 'nan'],
+    ['chieu3', '4', '10A6', 'TIN', 'T. HẢO', 'PM3'],
+    ['chieu3', '5', '10A6', 'TIN', 'T. HẢO', 'PM3'],
+    ['chieu4', '1', '10A6', 'ĐỊA', 'C. LÝ', 'nan'],
+    ['chieu4', '2', '10A6', 'MOS', 'T. HẢO', 'PM4'],
+    ['chieu4', '3', '10A6', 'MOS', 'T. HẢO', 'PM4'],
+    ['chieu4', '4', '10A6', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['chieu4', '5', '10A6', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['chieu5', '1', '10A6', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['chieu5', '2', '10A6', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu5', '3', '10A6', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu5', '4', '10A6', 'HOÁ', 'C. TRANG (H)', 'nan'],
+    ['chieu5', '5', '10A6', 'HOÁ', 'C. TRANG (H)', 'nan'],
+    ['chieu6', '1', '10A6', 'ĐỊA', 'C. LÝ', 'nan'],
+    ['chieu6', '2', '10A6', 'GDĐP', 'C. HƯƠNG (Đ)', 'nan'],
+    ['chieu6', '3', '10A6', 'AVBN', 'AVBN1', 'nan'],
+    ['chieu6', '4', '10A6', 'AVBN', 'AVBN1', 'nan'],
+    ['chieu6', '5', '10A6', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['sang2', '1', '10A6', 'TNHN', 'C. NGÂN (H)', 'nan'],
+    ['sang2', '2', '10A6', 'TNHN', 'C. NGÂN (H)', 'nan'],
+    ['sang3', '1', '10A6', 'LÝ', 'C. LAN (L)', 'nan'],
+    ['sang3', '2', '10A6', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['sang5', '1', '10A6', 'LÝ', 'C. LAN (L)', 'nan'],
+    ['sang5', '2', '10A6', 'LÝ', 'C. LAN (L)', 'nan'],
+    ['chieu2', '1', '10B1', 'TIN', 'T. HẢO', 'PM4'],
+    ['chieu2', '2', '10B1', 'TIN', 'T. HẢO', 'PM4'],
+    ['chieu2', '3', '10B1', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu2', '4', '10B1', 'TNHN-1', 'C. TRANG (H)', 'nan'],
+    ['chieu2', '5', '10B1', 'CC', 'C. TRANG (H)', 'nan'],
+    ['chieu3', '1', '10B1', 'HOÁ', 'C. TRANG (H)', 'nan'],
+    ['chieu3', '2', '10B1', 'HOÁ', 'C. TRANG (H)', 'nan'],
+    ['chieu3', '3', '10B1', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['chieu3', '4', '10B1', 'TNHN', 'C. NGÂN (H)', 'nan'],
+    ['chieu3', '5', '10B1', 'TNHN', 'C. NGÂN (H)', 'nan'],
+    ['chieu4', '1', '10B1', 'TOÁN', 'T. LÂM', 'nan'],
+    ['chieu4', '2', '10B1', 'TOÁN', 'T. LÂM', 'nan'],
+    ['chieu4', '3', '10B1', 'GDĐP', 'C. HƯƠNG (Đ)', 'nan'],
+    ['chieu4', '4', '10B1', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['chieu4', '5', '10B1', 'GDQP', 'T. DŨNG', 'nan'],
+    ['chieu5', '1', '10B1', 'MOS', 'C. PHỤNG', 'PM5'],
+    ['chieu5', '2', '10B1', 'MOS', 'C. PHỤNG', 'PM5'],
+    ['chieu5', '3', '10B1', 'SINH', 'C. LIÊM', 'nan'],
+    ['chieu5', '4', '10B1', 'TOÁN', 'T. LÂM', 'nan'],
+    ['chieu5', '5', '10B1', 'ANH', 'C. HƯƠNG (A)', 'nan'],
+    ['chieu6', '1', '10B1', 'TOÁN', 'T. LÂM', 'nan'],
+    ['chieu6', '2', '10B1', 'SỬ', 'C. HỒNG (S)', 'nan'],
+    ['chieu6', '3', '10B1', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu6', '4', '10B1', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu6', '5', '10B1', 'HOÁ', 'C. TRANG (H)', 'nan'],
+    ['sang2', '1', '10B1', 'ANH', 'C. HƯƠNG (A)', 'nan'],
+    ['sang2', '2', '10B1', 'ANH', 'C. HƯƠNG (A)', 'nan'],
+    ['sang3', '1', '10B1', 'SINH', 'C. LIÊM', 'nan'],
+    ['sang3', '2', '10B1', 'SINH', 'C. LIÊM', 'nan'],
+    ['sang5', '1', '10B1', 'AVBN', 'AVBN2', 'nan'],
+    ['sang5', '2', '10B1', 'AVBN', 'AVBN2', 'nan'],
+    ['chieu2', '1', '10B2', 'TNHN', 'T. T-PHÁT', 'nan'],
+    ['chieu2', '2', '10B2', 'TNHN', 'T. T-PHÁT', 'nan'],
+    ['chieu2', '3', '10B2', 'HOÁ', 'T. LUÂN', 'nan'],
+    ['chieu2', '4', '10B2', 'TNHN-1', 'T. T-PHÁT', 'nan'],
+    ['chieu2', '5', '10B2', 'CC', 'T. T-PHÁT', 'nan'],
+    ['chieu3', '1', '10B2', 'TIN', 'C. NHÀN', 'PM4'],
+    ['chieu3', '2', '10B2', 'TIN', 'C. NHÀN', 'PM4'],
+    ['chieu3', '3', '10B2', 'SINH', 'T. T-PHÁT', 'nan'],
+    ['chieu3', '4', '10B2', 'HOÁ', 'T. LUÂN', 'nan'],
+    ['chieu3', '5', '10B2', 'HOÁ', 'T. LUÂN', 'nan'],
+    ['chieu4', '1', '10B2', 'ANH', 'C. HẠNH (A)', 'nan'],
+    ['chieu4', '2', '10B2', 'SỬ', 'C. HỒNG (S)', 'nan'],
+    ['chieu4', '3', '10B2', 'SINH', 'T. T-PHÁT', 'nan'],
+    ['chieu4', '4', '10B2', 'SINH', 'T. T-PHÁT', 'nan'],
+    ['chieu4', '5', '10B2', 'TOÁN', 'T. TÀI', 'nan'],
+    ['chieu5', '1', '10B2', 'ANH', 'C. HẠNH (A)', 'nan'],
+    ['chieu5', '2', '10B2', 'ANH', 'C. HẠNH (A)', 'nan'],
+    ['chieu5', '3', '10B2', 'TOÁN', 'T. TÀI', 'nan'],
+    ['chieu5', '4', '10B2', 'MOS', 'C. NHÀN', 'PM2'],
+    ['chieu5', '5', '10B2', 'MOS', 'C. NHÀN', 'PM2'],
+    ['chieu6', '1', '10B2', 'VĂN', 'C. THẢO', 'nan'],
+    ['chieu6', '2', '10B2', 'VĂN', 'C. THẢO', 'nan'],
+    ['chieu6', '3', '10B2', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['chieu6', '4', '10B2', 'AVBN', 'AVBN2', 'nan'],
+    ['chieu6', '5', '10B2', 'AVBN', 'AVBN2', 'nan'],
+    ['sang2', '1', '10B2', 'TOÁN', 'T. TÀI', 'nan'],
+    ['sang2', '2', '10B2', 'TOÁN', 'T. TÀI', 'nan'],
+    ['sang3', '1', '10B2', 'GDQP', 'T. DŨNG', 'nan'],
+    ['sang3', '2', '10B2', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['sang5', '1', '10B2', 'GDĐP', 'T. THANH', 'nan'],
+    ['sang5', '2', '10B2', 'VĂN', 'C. THẢO', 'nan'],
+    ['chieu3', '2', '10CD1', 'ANH', 'C. XUÂN', 'nan'],
+    ['chieu3', '3', '10CD1', 'ANH', 'C. XUÂN', 'nan'],
+    ['chieu4', '2', '10CD1', 'ĐỊA', 'T. NAM', 'nan'],
+    ['chieu4', '3', '10CD1', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['chieu5', '2', '10CD1', 'SỬ', 'C. HỒNG (S)', 'nan'],
+    ['chieu5', '3', '10CD1', 'VĂN', 'T. ANH', 'nan'],
+    ['sang2', '1', '10CD1', 'CC', 'C. HỒNG (S)', 'nan'],
+    ['sang2', '2', '10CD1', 'TNHN-1', 'C. HỒNG (S)', 'nan'],
+    ['sang2', '3', '10CD1', 'SỬ', 'C. HỒNG (S)', 'nan'],
+    ['sang2', '4', '10CD1', 'MOS', 'C. PHỤNG', 'PM2'],
+    ['sang2', '5', '10CD1', 'MOS', 'C. PHỤNG', 'PM2'],
+    ['sang3', '1', '10CD1', 'VĂN', 'T. ANH', 'nan'],
+    ['sang3', '2', '10CD1', 'KTPL', 'C. CHÂU', 'nan'],
+    ['sang3', '3', '10CD1', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['sang3', '4', '10CD1', 'AVBN', 'AVBN4', 'nan'],
+    ['sang3', '5', '10CD1', 'AVBN', 'AVBN4', 'nan'],
+    ['sang4', '1', '10CD1', 'TIN', 'C. PHỤNG', 'PM1'],
+    ['sang4', '2', '10CD1', 'TIN', 'C. PHỤNG', 'PM1'],
+    ['sang4', '3', '10CD1', 'KTPL', 'C. CHÂU', 'nan'],
+    ['sang4', '4', '10CD1', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['sang4', '5', '10CD1', 'ANH', 'C. XUÂN', 'nan'],
+    ['sang5', '1', '10CD1', 'TNHN', 'T. TÚ', 'nan'],
+    ['sang5', '2', '10CD1', 'TNHN', 'T. TÚ', 'nan'],
+    ['sang5', '3', '10CD1', 'ĐỊA', 'T. NAM', 'nan'],
+    ['sang5', '4', '10CD1', 'ĐỊA', 'T. NAM', 'nan'],
+    ['sang5', '5', '10CD1', 'GDĐP', 'T. THANH', 'nan'],
+    ['sang6', '1', '10CD1', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['sang6', '2', '10CD1', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['sang6', '3', '10CD1', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['sang6', '4', '10CD1', 'VĂN', 'T. ANH', 'nan'],
+    ['sang6', '5', '10CD1', 'VĂN', 'T. ANH', 'nan'],
+    ['chieu3', '2', '10CD2', 'ANH', 'C. THÁI', 'nan'],
+    ['chieu3', '3', '10CD2', 'ANH', 'C. THÁI', 'nan'],
+    ['chieu4', '2', '10CD2', 'ANH', 'C. THÁI', 'nan'],
+    ['chieu4', '3', '10CD2', 'TOÁN', 'C. THÚY', 'nan'],
+    ['chieu5', '2', '10CD2', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['chieu5', '3', '10CD2', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['sang2', '1', '10CD2', 'CC', 'C. HƯƠNG (Đ)', 'nan'],
+    ['sang2', '2', '10CD2', 'TNHN-1', 'C. HƯƠNG (Đ)', 'nan'],
+    ['sang2', '3', '10CD2', 'TOÁN', 'C. THÚY', 'nan'],
+    ['sang2', '4', '10CD2', 'TOÁN', 'C. THÚY', 'nan'],
+    ['sang2', '5', '10CD2', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['sang3', '1', '10CD2', 'MOS', 'C. PHỤNG', 'PM2'],
+    ['sang3', '2', '10CD2', 'MOS', 'C. PHỤNG', 'PM2'],
+    ['sang3', '3', '10CD2', 'TIN', 'C. PHỤNG', 'PM2'],
+    ['sang3', '4', '10CD2', 'TIN', 'C. PHỤNG', 'PM2'],
+    ['sang3', '5', '10CD2', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['sang4', '1', '10CD2', 'KTPL', 'C. CHÂU', 'nan'],
+    ['sang4', '2', '10CD2', 'SỬ', 'C. NÊ', 'nan'],
+    ['sang4', '3', '10CD2', 'ĐỊA', 'C. HƯƠNG (Đ)', 'nan'],
+    ['sang4', '4', '10CD2', 'ĐỊA', 'C. HƯƠNG (Đ)', 'nan'],
+    ['sang4', '5', '10CD2', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['sang5', '1', '10CD2', 'TNHN', 'C. UYÊN (L)', 'nan'],
+    ['sang5', '2', '10CD2', 'TNHN', 'C. UYÊN (L)', 'nan'],
+    ['sang5', '3', '10CD2', 'AVBN', 'AVBN4', 'nan'],
+    ['sang5', '4', '10CD2', 'AVBN', 'AVBN4', 'nan'],
+    ['sang5', '5', '10CD2', 'GDĐP', 'T. NAM', 'nan'],
+    ['sang6', '1', '10CD2', 'ĐỊA', 'C. HƯƠNG (Đ)', 'nan'],
+    ['sang6', '2', '10CD2', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['sang6', '3', '10CD2', 'SỬ', 'C. NÊ', 'nan'],
+    ['sang6', '4', '10CD2', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['sang6', '5', '10CD2', 'KTPL', 'C. CHÂU', 'nan'],
+    ['chieu3', '2', '10H', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['chieu3', '3', '10H', 'ANH', 'C. OANH', 'nan'],
+    ['chieu4', '2', '10H', 'SỬ', 'T. TẤN (S)', 'nan'],
+    ['chieu4', '3', '10H', 'TOÁN', 'T. THU', 'nan'],
+    ['chieu5', '2', '10H', 'ANH', 'C. OANH', 'nan'],
+    ['chieu5', '3', '10H', 'ANH', 'C. OANH', 'nan'],
+    ['sang2', '1', '10H', 'CC', 'C. LÝ', 'nan'],
+    ['sang2', '2', '10H', 'TNHN-1', 'C. LÝ', 'nan'],
+    ['sang2', '3', '10H', 'ĐỊA', 'C. LÝ', 'nan'],
+    ['sang2', '4', '10H', 'AVBN', 'AVBN4', 'nan'],
+    ['sang2', '5', '10H', 'AVBN', 'AVBN4', 'nan'],
+    ['sang3', '1', '10H', 'KTPL', 'C. CHÂU', 'nan'],
+    ['sang3', '2', '10H', 'TNHN', 'T. TÚ', 'nan'],
+    ['sang3', '3', '10H', 'TNHN', 'T. TÚ', 'nan'],
+    ['sang3', '4', '10H', 'HOÁ', 'T. VĂN', 'nan'],
+    ['sang3', '5', '10H', 'HOÁ', 'T. VĂN', 'nan'],
+    ['sang4', '1', '10H', 'ĐỊA', 'C. LÝ', 'nan'],
+    ['sang4', '2', '10H', 'ĐỊA', 'C. LÝ', 'nan'],
+    ['sang4', '3', '10H', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['sang4', '4', '10H', 'KTPL', 'C. CHÂU', 'nan'],
+    ['sang4', '5', '10H', 'GDĐP', 'C. LÝ', 'nan'],
+    ['sang5', '1', '10H', 'TOÁN', 'T. THU', 'nan'],
+    ['sang5', '2', '10H', 'TOÁN', 'T. THU', 'nan'],
+    ['sang5', '3', '10H', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['sang5', '4', '10H', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['sang5', '5', '10H', 'HOÁ', 'T. VĂN', 'nan'],
+    ['sang6', '1', '10H', 'MOS', 'C. TIỀN', 'PM5'],
+    ['sang6', '2', '10H', 'MOS', 'C. TIỀN', 'PM5'],
+    ['sang6', '3', '10H', 'TIN', 'C. TIỀN', 'PM5'],
+    ['sang6', '4', '10H', 'TIN', 'C. TIỀN', 'PM5'],
+    ['sang6', '5', '10H', 'TOÁN', 'T. THU', 'nan'],
+    ['chieu3', '2', '10L1', 'LÝ', 'C. GIANG (L)', 'nan'],
+    ['chieu3', '3', '10L1', 'KTPL', 'C. QUYỀN', 'nan'],
+    ['chieu4', '2', '10L1', 'ANH', 'C. HẠNH (A)', 'nan'],
+    ['chieu4', '3', '10L1', 'KTPL', 'C. QUYỀN', 'nan'],
+    ['chieu5', '2', '10L1', 'AVBN', 'AVBN4', 'nan'],
+    ['chieu5', '3', '10L1', 'AVBN', 'AVBN4', 'nan'],
+    ['sang2', '1', '10L1', 'CC', 'C. HẠNH (A)', 'nan'],
+    ['sang2', '2', '10L1', 'TNHN-1', 'C. HẠNH (A)', 'nan'],
+    ['sang2', '3', '10L1', 'SỬ', 'T. TẤN (S)', 'nan'],
+    ['sang2', '4', '10L1', 'ANH', 'C. HẠNH (A)', 'nan'],
+    ['sang2', '5', '10L1', 'ANH', 'C. HẠNH (A)', 'nan'],
+    ['sang3', '1', '10L1', 'TNHN', 'C. NGÂN (H)', 'nan'],
+    ['sang3', '2', '10L1', 'TNHN', 'C. NGÂN (H)', 'nan'],
+    ['sang3', '3', '10L1', 'CÔNG NGHỆ', 'T. THÁI', 'nan'],
+    ['sang3', '4', '10L1', 'TIN', 'C. TIỀN', 'PM3'],
+    ['sang3', '5', '10L1', 'TIN', 'C. TIỀN', 'PM3'],
+    ['sang4', '1', '10L1', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['sang4', '2', '10L1', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['sang4', '3', '10L1', 'GDĐP', 'C. LÝ', 'nan'],
+    ['sang4', '4', '10L1', 'MOS', 'C. TIỀN', 'PM3'],
+    ['sang4', '5', '10L1', 'MOS', 'C. TIỀN', 'PM3'],
+    ['sang5', '1', '10L1', 'LÝ', 'C. GIANG (L)', 'nan'],
+    ['sang5', '2', '10L1', 'LÝ', 'C. GIANG (L)', 'nan'],
+    ['sang5', '3', '10L1', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['sang5', '4', '10L1', 'VĂN', 'C. GIANG', 'nan'],
+    ['sang5', '5', '10L1', 'VĂN', 'C. GIANG', 'nan'],
+    ['sang6', '1', '10L1', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['sang6', '2', '10L1', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['sang6', '3', '10L1', 'CÔNG NGHỆ', 'T. THÁI', 'nan'],
+    ['sang6', '4', '10L1', 'VĂN', 'C. GIANG', 'nan'],
+    ['sang6', '5', '10L1', 'TIN', 'C. TIỀN', 'PM5'],
+    ['chieu3', '2', '10L2', 'VĂN', 'C. THẢO', 'nan'],
+    ['chieu3', '3', '10L2', 'GDĐP', 'C. NGA', 'nan'],
+    ['chieu4', '2', '10L2', 'TOÁN', 'T. TÀI', 'nan'],
+    ['chieu4', '3', '10L2', 'CÔNG NGHỆ', 'T. THÁI', 'nan'],
+    ['chieu5', '2', '10L2', 'TOÁN', 'T. TÀI', 'nan'],
+    ['chieu5', '3', '10L2', 'TIN', 'C. TIỀN', 'PM5'],
+    ['sang2', '1', '10L2', 'CC', 'C. CHÂU', 'nan'],
+    ['sang2', '2', '10L2', 'TNHN-1', 'C. CHÂU', 'nan'],
+    ['sang2', '3', '10L2', 'KTPL', 'C. CHÂU', 'nan'],
+    ['sang2', '4', '10L2', 'TNHN', 'C. NGÂN (H)', 'nan'],
+    ['sang2', '5', '10L2', 'TNHN', 'C. NGÂN (H)', 'nan'],
+    ['sang3', '1', '10L2', 'TIN', 'C. TIỀN', 'PM3'],
+    ['sang3', '2', '10L2', 'TIN', 'C. TIỀN', 'PM3'],
+    ['sang3', '3', '10L2', 'KTPL', 'C. CHÂU', 'nan'],
+    ['sang3', '4', '10L2', 'CÔNG NGHỆ', 'T. THÁI', 'nan'],
+    ['sang3', '5', '10L2', 'GDQP', 'T. DŨNG', 'nan'],
+    ['sang4', '1', '10L2', 'ANH', 'C. HƯƠNG (A)', 'nan'],
+    ['sang4', '2', '10L2', 'MOS', 'C. TIỀN', 'PM3'],
+    ['sang4', '3', '10L2', 'MOS', 'C. TIỀN', 'PM3'],
+    ['sang4', '4', '10L2', 'AVBN', 'AVBN4', 'nan'],
+    ['sang4', '5', '10L2', 'AVBN', 'AVBN4', 'nan'],
+    ['sang5', '1', '10L2', 'ANH', 'C. HƯƠNG (A)', 'nan'],
+    ['sang5', '2', '10L2', 'ANH', 'C. HƯƠNG (A)', 'nan'],
+    ['sang5', '3', '10L2', 'LÝ', 'C. LAN (L)', 'nan'],
+    ['sang5', '4', '10L2', 'VĂN', 'C. THẢO', 'nan'],
+    ['sang5', '5', '10L2', 'VĂN', 'C. THẢO', 'nan'],
+    ['sang6', '1', '10L2', 'LÝ', 'C. LAN (L)', 'nan'],
+    ['sang6', '2', '10L2', 'LÝ', 'C. LAN (L)', 'nan'],
+    ['sang6', '3', '10L2', 'TOÁN', 'T. TÀI', 'nan'],
+    ['sang6', '4', '10L2', 'TOÁN', 'T. TÀI', 'nan'],
+    ['sang6', '5', '10L2', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['chieu3', '2', '10L3', 'LÝ', 'T. ÂN', 'nan'],
+    ['chieu3', '3', '10L3', 'LÝ', 'T. ÂN', 'nan'],
+    ['chieu4', '2', '10L3', 'TOÁN', 'C. TRANG (T)', 'nan'],
+    ['chieu4', '3', '10L3', 'TOÁN', 'C. TRANG (T)', 'nan'],
+    ['chieu5', '2', '10L3', 'LÝ', 'T. ÂN', 'nan'],
+    ['chieu5', '3', '10L3', 'TOÁN', 'C. TRANG (T)', 'nan'],
+    ['sang2', '1', '10L3', 'CC', 'C. QUYỀN', 'nan'],
+    ['sang2', '2', '10L3', 'TNHN-1', 'C. QUYỀN', 'nan'],
+    ['sang2', '3', '10L3', 'KTPL', 'C. QUYỀN', 'nan'],
+    ['sang2', '4', '10L3', 'MOS', 'C. TIỀN', 'PM4'],
+    ['sang2', '5', '10L3', 'MOS', 'C. TIỀN', 'PM4'],
+    ['sang3', '1', '10L3', 'CÔNG NGHỆ', 'T. THÁI', 'nan'],
+    ['sang3', '2', '10L3', 'GDĐP', 'C. GIANG', 'nan'],
+    ['sang3', '3', '10L3', 'TIN', 'C. TIỀN', 'PM3'],
+    ['sang3', '4', '10L3', 'GDQP', 'T. DŨNG', 'nan'],
+    ['sang3', '5', '10L3', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['sang4', '1', '10L3', 'TNHN', 'C. QUYỀN', 'nan'],
+    ['sang4', '2', '10L3', 'TNHN', 'C. QUYỀN', 'nan'],
+    ['sang4', '3', '10L3', 'ANH', 'C. TÚ', 'nan'],
+    ['sang4', '4', '10L3', 'ANH', 'C. TÚ', 'nan'],
+    ['sang4', '5', '10L3', 'KTPL', 'C. QUYỀN', 'nan'],
+    ['sang5', '1', '10L3', 'TIN', 'C. TIỀN', 'PM4'],
+    ['sang5', '2', '10L3', 'TIN', 'C. TIỀN', 'PM4'],
+    ['sang5', '3', '10L3', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['sang5', '4', '10L3', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['sang5', '5', '10L3', 'ANH', 'C. TÚ', 'nan'],
+    ['sang6', '1', '10L3', 'AVBN', 'AVBN4', 'nan'],
+    ['sang6', '2', '10L3', 'AVBN', 'AVBN4', 'nan'],
+    ['sang6', '3', '10L3', 'TOÁN', 'C. TRANG (T)', 'nan'],
+    ['sang6', '4', '10L3', 'CÔNG NGHỆ', 'T. THÁI', 'nan'],
+    ['sang6', '5', '10L3', 'SỬ', 'C. NÊ', 'nan'],
+    ['chieu3', '2', '10L4', 'KTPL', 'C. QUYỀN', 'nan'],
+    ['chieu3', '3', '10L4', 'TIN', 'C. TIỀN', 'PM4'],
+    ['chieu4', '2', '10L4', 'MOS', 'C. TIỀN', 'PM5'],
+    ['chieu4', '3', '10L4', 'MOS', 'C. TIỀN', 'PM5'],
+    ['chieu5', '2', '10L4', 'ANH', 'C. XUÂN', 'nan'],
+    ['chieu5', '3', '10L4', 'ANH', 'C. XUÂN', 'nan'],
+    ['sang2', '1', '10L4', 'CC', 'T. TẤN (S)', 'nan'],
+    ['sang2', '2', '10L4', 'TNHN-1', 'T. TẤN (S)', 'nan'],
+    ['sang2', '3', '10L4', 'TNHN', 'C. TRÂM', 'nan'],
+    ['sang2', '4', '10L4', 'TNHN', 'C. TRÂM', 'nan'],
+    ['sang2', '5', '10L4', 'LÝ', 'C. TRÂM', 'nan'],
+    ['sang3', '1', '10L4', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['sang3', '2', '10L4', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['sang3', '3', '10L4', 'LÝ', 'C. TRÂM', 'nan'],
+    ['sang3', '4', '10L4', 'LÝ', 'C. TRÂM', 'nan'],
+    ['sang3', '5', '10L4', 'CÔNG NGHỆ', 'T. THÁI', 'nan'],
+    ['sang4', '1', '10L4', 'AVBN', 'AVBN4', 'nan'],
+    ['sang4', '2', '10L4', 'AVBN', 'AVBN4', 'nan'],
+    ['sang4', '3', '10L4', 'KTPL', 'C. QUYỀN', 'nan'],
+    ['sang4', '4', '10L4', 'ANH', 'C. XUÂN', 'nan'],
+    ['sang4', '5', '10L4', 'TOÁN', 'C. TRANG (T)', 'nan'],
+    ['sang5', '1', '10L4', 'TOÁN', 'C. TRANG (T)', 'nan'],
+    ['sang5', '2', '10L4', 'TOÁN', 'C. TRANG (T)', 'nan'],
+    ['sang5', '3', '10L4', 'TIN', 'C. TIỀN', 'PM4'],
+    ['sang5', '4', '10L4', 'TIN', 'C. TIỀN', 'PM4'],
+    ['sang5', '5', '10L4', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['sang6', '1', '10L4', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['sang6', '2', '10L4', 'SỬ', 'T. TẤN (S)', 'nan'],
+    ['sang6', '3', '10L4', 'GDĐP', 'C. GIANG', 'nan'],
+    ['sang6', '4', '10L4', 'TOÁN', 'C. TRANG (T)', 'nan'],
+    ['sang6', '5', '10L4', 'CÔNG NGHỆ', 'T. THÁI', 'nan'],
+    ['chieu2', '1', '11A1', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['chieu2', '2', '11A1', 'VĂN', 'T. ANH', 'nan'],
+    ['chieu2', '3', '11A1', 'SINH', 'T. V-PHÁT', 'nan'],
+    ['chieu2', '4', '11A1', 'TNHN-1', 'T. PHƯỚC', 'nan'],
+    ['chieu2', '5', '11A1', 'CC', 'T. PHƯỚC', 'nan'],
+    ['chieu3', '1', '11A1', 'VĂN', 'T. ANH', 'nan'],
+    ['chieu3', '2', '11A1', 'VĂN', 'T. ANH', 'nan'],
+    ['chieu3', '3', '11A1', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['chieu3', '4', '11A1', 'MOS', 'T. VIỆT', 'PM1'],
+    ['chieu3', '5', '11A1', 'MOS', 'T. VIỆT', 'PM1'],
+    ['chieu4', '1', '11A1', 'GDQP', 'T. DŨNG', 'nan'],
+    ['chieu4', '2', '11A1', 'TNHN', 'C. HƯƠNG (A)', 'nan'],
+    ['chieu4', '3', '11A1', 'TNHN', 'C. HƯƠNG (A)', 'nan'],
+    ['chieu4', '4', '11A1', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['chieu4', '5', '11A1', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['chieu5', '1', '11A1', 'LÝ', 'C. PHƯỢNG', 'nan'],
+    ['chieu5', '2', '11A1', 'LÝ', 'C. PHƯỢNG', 'nan'],
+    ['chieu5', '3', '11A1', 'HOÁ', 'C. TRANG (H)', 'nan'],
+    ['chieu5', '4', '11A1', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['chieu5', '5', '11A1', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['chieu6', '1', '11A1', 'HOÁ', 'C. TRANG (H)', 'nan'],
+    ['chieu6', '2', '11A1', 'HOÁ', 'C. TRANG (H)', 'nan'],
+    ['chieu6', '3', '11A1', 'GDĐP', 'C. LỆ', 'nan'],
+    ['chieu6', '4', '11A1', 'AVBN', 'AVBN4', 'nan'],
+    ['chieu6', '5', '11A1', 'AVBN', 'AVBN4', 'nan'],
+    ['sang4', '3', '11A1', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['sang4', '4', '11A1', 'SINH', 'T. V-PHÁT', 'nan'],
+    ['sang5', '3', '11A1', 'TIN', 'C. PHỤNG', 'PM3'],
+    ['sang5', '4', '11A1', 'TIN', 'C. PHỤNG', 'PM3'],
+    ['sang6', '3', '11A1', 'LÝ', 'C. PHƯỢNG', 'nan'],
+    ['sang6', '4', '11A1', 'SỬ', 'T. TẤN (S)', 'nan'],
+    ['chieu2', '1', '11A2', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['chieu2', '2', '11A2', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['chieu2', '3', '11A2', 'ANH', 'C. THÁI', 'nan'],
+    ['chieu2', '4', '11A2', 'TNHN-1', 'C. LAN (T)', 'nan'],
+    ['chieu2', '5', '11A2', 'CC', 'C. LAN (T)', 'nan'],
+    ['chieu3', '1', '11A2', 'SINH', 'C. HOA (S)', 'nan'],
+    ['chieu3', '2', '11A2', 'HOÁ', 'C. NGÂN (H)', 'nan'],
+    ['chieu3', '3', '11A2', 'GDQP', 'T. DŨNG', 'nan'],
+    ['chieu3', '4', '11A2', 'VĂN', 'C. NGỌC', 'nan'],
+    ['chieu3', '5', '11A2', 'VĂN', 'C. NGỌC', 'nan'],
+    ['chieu4', '1', '11A2', 'AVBN', 'AVBN4', 'nan'],
+    ['chieu4', '2', '11A2', 'AVBN', 'AVBN4', 'nan'],
+    ['chieu4', '3', '11A2', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['chieu4', '4', '11A2', 'ANH', 'C. THÁI', 'nan'],
+    ['chieu4', '5', '11A2', 'ANH', 'C. THÁI', 'nan'],
+    ['chieu5', '1', '11A2', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['chieu5', '2', '11A2', 'TNHN', 'C. HƯƠNG (A)', 'nan'],
+    ['chieu5', '3', '11A2', 'TNHN', 'C. HƯƠNG (A)', 'nan'],
+    ['chieu5', '4', '11A2', 'SỬ', 'C. HỒNG (S)', 'nan'],
+    ['chieu5', '5', '11A2', 'SINH', 'C. HOA (S)', 'nan'],
+    ['chieu6', '1', '11A2', 'VĂN', 'C. NGỌC', 'nan'],
+    ['chieu6', '2', '11A2', 'GDĐP', 'C. LỆ', 'nan'],
+    ['chieu6', '3', '11A2', 'HOÁ', 'C. NGÂN (H)', 'nan'],
+    ['chieu6', '4', '11A2', 'HOÁ', 'C. NGÂN (H)', 'nan'],
+    ['chieu6', '5', '11A2', 'LÝ', 'T. SANG (L)', 'nan'],
+    ['sang4', '3', '11A2', 'TIN', 'C. PHỤNG', 'PM1'],
+    ['sang4', '4', '11A2', 'TIN', 'C. PHỤNG', 'PM1'],
+    ['sang5', '3', '11A2', 'LÝ', 'T. SANG (L)', 'nan'],
+    ['sang5', '4', '11A2', 'LÝ', 'T. SANG (L)', 'nan'],
+    ['sang6', '3', '11A2', 'MOS', 'T. VIỆT', 'PM3'],
+    ['sang6', '4', '11A2', 'MOS', 'T. VIỆT', 'PM3'],
+    ['chieu2', '1', '11A3', 'MOS', 'C. NGÂN (TI)', 'PM2'],
+    ['chieu2', '2', '11A3', 'MOS', 'C. NGÂN (TI)', 'PM2'],
+    ['chieu2', '3', '11A3', 'GDĐP', 'C. NGỌC', 'nan'],
+    ['chieu2', '4', '11A3', 'TNHN-1', 'C. DUNG', 'nan'],
+    ['chieu2', '5', '11A3', 'CC', 'C. DUNG', 'nan'],
+    ['chieu3', '1', '11A3', 'VĂN', 'T. TÙNG', 'nan'],
+    ['chieu3', '2', '11A3', 'VĂN', 'T. TÙNG', 'nan'],
+    ['chieu3', '3', '11A3', 'LÝ', 'C. HỒNG (L)', 'nan'],
+    ['chieu3', '4', '11A3', 'SINH', 'C. HOA (S)', 'nan'],
+    ['chieu3', '5', '11A3', 'ANH', 'C. HƯƠNG (A)', 'nan'],
+    ['chieu4', '1', '11A3', 'TNHN', 'T. HIỂN', 'nan'],
+    ['chieu4', '2', '11A3', 'TNHN', 'T. HIỂN', 'nan'],
+    ['chieu4', '3', '11A3', 'SỬ', 'C. HỒNG (S)', 'nan'],
+    ['chieu4', '4', '11A3', 'ANH', 'C. HƯƠNG (A)', 'nan'],
+    ['chieu4', '5', '11A3', 'ANH', 'C. HƯƠNG (A)', 'nan'],
+    ['chieu5', '1', '11A3', 'HOÁ', 'C. HIẾN', 'nan'],
+    ['chieu5', '2', '11A3', 'TIN', 'C. NGÂN (TI)', 'PM3'],
+    ['chieu5', '3', '11A3', 'TIN', 'C. NGÂN (TI)', 'PM3'],
+    ['chieu5', '4', '11A3', 'AVBN', 'AVBN4', 'nan'],
+    ['chieu5', '5', '11A3', 'AVBN', 'AVBN4', 'nan'],
+    ['chieu6', '1', '11A3', 'HOÁ', 'C. HIẾN', 'nan'],
+    ['chieu6', '2', '11A3', 'HOÁ', 'C. HIẾN', 'nan'],
+    ['chieu6', '3', '11A3', 'TOÁN', 'C. DUNG', 'nan'],
+    ['chieu6', '4', '11A3', 'TOÁN', 'C. DUNG', 'nan'],
+    ['chieu6', '5', '11A3', 'VĂN', 'T. TÙNG', 'nan'],
+    ['sang4', '3', '11A3', 'TOÁN', 'C. DUNG', 'nan'],
+    ['sang4', '4', '11A3', 'GDQP', 'T. DŨNG', 'nan'],
+    ['sang5', '3', '11A3', 'SINH', 'C. HOA (S)', 'nan'],
+    ['sang5', '4', '11A3', 'TOÁN', 'C. DUNG', 'nan'],
+    ['sang6', '3', '11A3', 'LÝ', 'C. HỒNG (L)', 'nan'],
+    ['sang6', '4', '11A3', 'LÝ', 'C. HỒNG (L)', 'nan'],
+    ['chieu2', '1', '11A4', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu2', '2', '11A4', 'TOÁN', 'T. TÀI', 'nan'],
+    ['chieu2', '3', '11A4', 'TOÁN', 'T. TÀI', 'nan'],
+    ['chieu2', '4', '11A4', 'TNHN-1', 'T. TÀI', 'nan'],
+    ['chieu2', '5', '11A4', 'CC', 'T. TÀI', 'nan'],
+    ['chieu3', '1', '11A4', 'SINH', 'T. T-PHÁT', 'nan'],
+    ['chieu3', '2', '11A4', 'MOS', 'C. NGÂN (TI)', 'PM5'],
+    ['chieu3', '3', '11A4', 'MOS', 'C. NGÂN (TI)', 'PM5'],
+    ['chieu3', '4', '11A4', 'HOÁ', 'T. VINH (H)', 'nan'],
+    ['chieu3', '5', '11A4', 'HOÁ', 'T. VINH (H)', 'nan'],
+    ['chieu4', '1', '11A4', 'AVBN', 'AVBN3', 'nan'],
+    ['chieu4', '2', '11A4', 'AVBN', 'AVBN3', 'nan'],
+    ['chieu4', '3', '11A4', 'TOÁN', 'T. TÀI', 'nan'],
+    ['chieu4', '4', '11A4', 'ANH', 'C. HẠNH (A)', 'nan'],
+    ['chieu4', '5', '11A4', 'ANH', 'C. HẠNH (A)', 'nan'],
+    ['chieu5', '1', '11A4', 'SINH', 'T. T-PHÁT', 'nan'],
+    ['chieu5', '2', '11A4', 'LÝ', 'C. TÂM (L)', 'nan'],
+    ['chieu5', '3', '11A4', 'LÝ', 'C. TÂM (L)', 'nan'],
+    ['chieu5', '4', '11A4', 'TOÁN', 'T. TÀI', 'nan'],
+    ['chieu5', '5', '11A4', 'ANH', 'C. HẠNH (A)', 'nan'],
+    ['chieu6', '1', '11A4', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu6', '2', '11A4', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu6', '3', '11A4', 'GDĐP', 'C. NGỌC', 'nan'],
+    ['chieu6', '4', '11A4', 'TIN', 'C. NGÂN (TI)', 'PM1'],
+    ['chieu6', '5', '11A4', 'TIN', 'C. NGÂN (TI)', 'PM1'],
+    ['sang4', '3', '11A4', 'TNHN', 'C. HƯƠNG (A)', 'nan'],
+    ['sang4', '4', '11A4', 'TNHN', 'C. HƯƠNG (A)', 'nan'],
+    ['sang5', '3', '11A4', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['sang5', '4', '11A4', 'SỬ', 'T. THANH', 'nan'],
+    ['sang6', '3', '11A4', 'LÝ', 'C. TÂM (L)', 'nan'],
+    ['sang6', '4', '11A4', 'HOÁ', 'T. VINH (H)', 'nan'],
+    ['chieu2', '1', '11A5', 'ANH', 'C. MAI', 'nan'],
+    ['chieu2', '2', '11A5', 'ANH', 'C. MAI', 'nan'],
+    ['chieu2', '3', '11A5', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['chieu2', '4', '11A5', 'TNHN-1', 'C. MAI', 'nan'],
+    ['chieu2', '5', '11A5', 'CC', 'C. MAI', 'nan'],
+    ['chieu3', '1', '11A5', 'ANH', 'C. MAI', 'nan'],
+    ['chieu3', '2', '11A5', 'LÝ', 'C. UYÊN (L)', 'nan'],
+    ['chieu3', '3', '11A5', 'LÝ', 'C. UYÊN (L)', 'nan'],
+    ['chieu3', '4', '11A5', 'AVBN', 'AVBN3', 'nan'],
+    ['chieu3', '5', '11A5', 'AVBN', 'AVBN3', 'nan'],
+    ['chieu4', '1', '11A5', 'TNHN', 'C. MAI', 'nan'],
+    ['chieu4', '2', '11A5', 'TNHN', 'C. MAI', 'nan'],
+    ['chieu4', '3', '11A5', 'SỬ', 'T. THANH', 'nan'],
+    ['chieu4', '4', '11A5', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['chieu4', '5', '11A5', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['chieu5', '1', '11A5', 'MOS', 'C. Ý', 'PM1'],
+    ['chieu5', '2', '11A5', 'MOS', 'C. Ý', 'PM1'],
+    ['chieu5', '3', '11A5', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['chieu5', '4', '11A5', 'HOÁ', 'C. THƯ', 'nan'],
+    ['chieu5', '5', '11A5', 'HOÁ', 'C. THƯ', 'nan'],
+    ['chieu6', '1', '11A5', 'HOÁ', 'C. THƯ', 'nan'],
+    ['chieu6', '2', '11A5', 'LÝ', 'C. UYÊN (L)', 'nan'],
+    ['chieu6', '3', '11A5', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['chieu6', '4', '11A5', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['chieu6', '5', '11A5', 'GDĐP', 'C. LỆ', 'nan'],
+    ['sang4', '3', '11A5', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['sang4', '4', '11A5', 'ĐỊA', 'T. MINH (Đ)', 'nan'],
+    ['sang5', '3', '11A5', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['sang5', '4', '11A5', 'ĐỊA', 'T. MINH (Đ)', 'nan'],
+    ['sang6', '3', '11A5', 'TIN', 'C. Ý', 'PM1'],
+    ['sang6', '4', '11A5', 'TIN', 'C. Ý', 'PM1'],
+    ['chieu2', '1', '11A6', 'LÝ', 'C. UYÊN (L)', 'nan'],
+    ['chieu2', '2', '11A6', 'LÝ', 'C. UYÊN (L)', 'nan'],
+    ['chieu2', '3', '11A6', 'TOÁN', 'C. TRANG (T)', 'nan'],
+    ['chieu2', '4', '11A6', 'TNHN-1', 'C. TRANG (T)', 'nan'],
+    ['chieu2', '5', '11A6', 'CC', 'C. TRANG (T)', 'nan'],
+    ['chieu3', '1', '11A6', 'LÝ', 'C. UYÊN (L)', 'nan'],
+    ['chieu3', '2', '11A6', 'VĂN', 'C. NGA', 'nan'],
+    ['chieu3', '3', '11A6', 'HOÁ', 'T. VĂN', 'nan'],
+    ['chieu3', '4', '11A6', 'TIN', 'C. Ý', 'PM2'],
+    ['chieu3', '5', '11A6', 'TIN', 'C. Ý', 'PM2'],
+    ['chieu4', '1', '11A6', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['chieu4', '2', '11A6', 'GDĐP', 'C. LỆ', 'nan'],
+    ['chieu4', '3', '11A6', 'ĐỊA', 'T. HÒA', 'nan'],
+    ['chieu4', '4', '11A6', 'ANH', 'C. XUÂN', 'nan'],
+    ['chieu4', '5', '11A6', 'ANH', 'C. XUÂN', 'nan'],
+    ['chieu5', '1', '11A6', 'TOÁN', 'C. TRANG (T)', 'nan'],
+    ['chieu5', '2', '11A6', 'SỬ', 'T. THANH', 'nan'],
+    ['chieu5', '3', '11A6', 'VĂN', 'C. NGA', 'nan'],
+    ['chieu5', '4', '11A6', 'VĂN', 'C. NGA', 'nan'],
+    ['chieu5', '5', '11A6', 'ANH', 'C. XUÂN', 'nan'],
+    ['chieu6', '1', '11A6', 'ĐỊA', 'T. HÒA', 'nan'],
+    ['chieu6', '2', '11A6', 'MOS', 'C. Ý', 'PM5'],
+    ['chieu6', '3', '11A6', 'MOS', 'C. Ý', 'PM5'],
+    ['chieu6', '4', '11A6', 'AVBN', 'AVBN3', 'nan'],
+    ['chieu6', '5', '11A6', 'AVBN', 'AVBN3', 'nan'],
+    ['sang4', '3', '11A6', 'TOÁN', 'C. TRANG (T)', 'nan'],
+    ['sang4', '4', '11A6', 'TOÁN', 'C. TRANG (T)', 'nan'],
+    ['sang5', '3', '11A6', 'HOÁ', 'T. VĂN', 'nan'],
+    ['sang5', '4', '11A6', 'HOÁ', 'T. VĂN', 'nan'],
+    ['sang6', '3', '11A6', 'TNHN', 'T. VĂN', 'nan'],
+    ['sang6', '4', '11A6', 'TNHN', 'T. VĂN', 'nan'],
+    ['chieu2', '1', '11A7', 'ANH', 'C. THỦY', 'nan'],
+    ['chieu2', '2', '11A7', 'ANH', 'C. THỦY', 'nan'],
+    ['chieu2', '3', '11A7', 'TOÁN', 'C. THÚY', 'nan'],
+    ['chieu2', '4', '11A7', 'TNHN-1', 'C. THÚY', 'nan'],
+    ['chieu2', '5', '11A7', 'CC', 'C. THÚY', 'nan'],
+    ['chieu3', '1', '11A7', 'HOÁ', 'T. VINH (H)', 'nan'],
+    ['chieu3', '2', '11A7', 'HOÁ', 'T. VINH (H)', 'nan'],
+    ['chieu3', '3', '11A7', 'LÝ', 'T. TÚ', 'nan'],
+    ['chieu3', '4', '11A7', 'VĂN', 'C. ÁNH', 'nan'],
+    ['chieu3', '5', '11A7', 'VĂN', 'C. ÁNH', 'nan'],
+    ['chieu4', '1', '11A7', 'SỬ', 'T. THANH', 'nan'],
+    ['chieu4', '2', '11A7', 'ĐỊA', 'C. LÝ', 'nan'],
+    ['chieu4', '3', '11A7', 'GDĐP', 'C. LỆ', 'nan'],
+    ['chieu4', '4', '11A7', 'AVBN', 'AVBN3', 'nan'],
+    ['chieu4', '5', '11A7', 'AVBN', 'AVBN3', 'nan'],
+    ['chieu5', '1', '11A7', 'TOÁN', 'C. THÚY', 'nan'],
+    ['chieu5', '2', '11A7', 'TOÁN', 'C. THÚY', 'nan'],
+    ['chieu5', '3', '11A7', 'ĐỊA', 'C. LÝ', 'nan'],
+    ['chieu5', '4', '11A7', 'LÝ', 'T. TÚ', 'nan'],
+    ['chieu5', '5', '11A7', 'LÝ', 'T. TÚ', 'nan'],
+    ['chieu6', '1', '11A7', 'TOÁN', 'C. THÚY', 'nan'],
+    ['chieu6', '2', '11A7', 'TIN', 'T. HIỀN', 'PM2'],
+    ['chieu6', '3', '11A7', 'TIN', 'T. HIỀN', 'PM2'],
+    ['chieu6', '4', '11A7', 'MOS', 'T. HIỀN', 'PM2'],
+    ['chieu6', '5', '11A7', 'MOS', 'T. HIỀN', 'PM2'],
+    ['sang4', '3', '11A7', 'TNHN', 'T. THÁI', 'nan'],
+    ['sang4', '4', '11A7', 'TNHN', 'T. THÁI', 'nan'],
+    ['sang5', '3', '11A7', 'ANH', 'C. THỦY', 'nan'],
+    ['sang5', '4', '11A7', 'VĂN', 'C. ÁNH', 'nan'],
+    ['sang6', '3', '11A7', 'HOÁ', 'T. VINH (H)', 'nan'],
+    ['sang6', '4', '11A7', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['chieu2', '1', '11A8', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['chieu2', '2', '11A8', 'LÝ', 'T. SANG (L)', 'nan'],
+    ['chieu2', '3', '11A8', 'LÝ', 'T. SANG (L)', 'nan'],
+    ['chieu2', '4', '11A8', 'TNHN-1', 'C. HẠNH (V)', 'nan'],
+    ['chieu2', '5', '11A8', 'CC', 'C. HẠNH (V)', 'nan'],
+    ['chieu3', '1', '11A8', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['chieu3', '2', '11A8', 'TNHN', 'T. THÁI', 'nan'],
+    ['chieu3', '3', '11A8', 'TNHN', 'T. THÁI', 'nan'],
+    ['chieu3', '4', '11A8', 'HOÁ', 'C. TRANG (H)', 'nan'],
+    ['chieu3', '5', '11A8', 'HOÁ', 'C. TRANG (H)', 'nan'],
+    ['chieu4', '1', '11A8', 'GDĐP', 'C. LỆ', 'nan'],
+    ['chieu4', '2', '11A8', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['chieu4', '3', '11A8', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['chieu4', '4', '11A8', 'ANH', 'C. TRINH', 'nan'],
+    ['chieu4', '5', '11A8', 'ANH', 'C. TRINH', 'nan'],
+    ['chieu5', '1', '11A8', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['chieu5', '2', '11A8', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['chieu5', '3', '11A8', 'SỬ', 'T. THANH', 'nan'],
+    ['chieu5', '4', '11A8', 'ĐỊA', 'C. LÝ', 'nan'],
+    ['chieu5', '5', '11A8', 'ANH', 'C. TRINH', 'nan'],
+    ['chieu6', '1', '11A8', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['chieu6', '2', '11A8', 'LÝ', 'T. SANG (L)', 'nan'],
+    ['chieu6', '3', '11A8', 'HOÁ', 'C. TRANG (H)', 'nan'],
+    ['chieu6', '4', '11A8', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['chieu6', '5', '11A8', 'ĐỊA', 'C. LÝ', 'nan'],
+    ['sang4', '3', '11A8', 'AVBN', 'AVBN3', 'nan'],
+    ['sang4', '4', '11A8', 'AVBN', 'AVBN3', 'nan'],
+    ['sang5', '3', '11A8', 'MOS', 'T. HIỀN', 'PM2'],
+    ['sang5', '4', '11A8', 'MOS', 'T. HIỀN', 'PM2'],
+    ['sang6', '3', '11A8', 'TIN', 'T. HIỀN', 'PM2'],
+    ['sang6', '4', '11A8', 'TIN', 'T. HIỀN', 'PM2'],
+    ['chieu2', '1', '11B1', 'TOÁN', 'T. KHANG', 'nan'],
+    ['chieu2', '2', '11B1', 'TOÁN', 'T. KHANG', 'nan'],
+    ['chieu2', '3', '11B1', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['chieu2', '4', '11B1', 'TNHN-1', 'C. HIẾN', 'nan'],
+    ['chieu2', '5', '11B1', 'CC', 'C. HIẾN', 'nan'],
+    ['chieu3', '1', '11B1', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['chieu3', '2', '11B1', 'TNHN', 'C. HIẾN', 'nan'],
+    ['chieu3', '3', '11B1', 'TNHN', 'C. HIẾN', 'nan'],
+    ['chieu3', '4', '11B1', 'ANH', 'C. THÁI', 'nan'],
+    ['chieu3', '5', '11B1', 'ANH', 'C. THÁI', 'nan'],
+    ['chieu4', '1', '11B1', 'SINH', 'T. T-PHÁT', 'nan'],
+    ['chieu4', '2', '11B1', 'SINH', 'T. T-PHÁT', 'nan'],
+    ['chieu4', '3', '11B1', 'TOÁN', 'T. KHANG', 'nan'],
+    ['chieu4', '4', '11B1', 'SỬ', 'T. THANH', 'nan'],
+    ['chieu4', '5', '11B1', 'GDĐP', 'T. SANG', 'nan'],
+    ['chieu5', '1', '11B1', 'VĂN', 'C. NGỌC', 'nan'],
+    ['chieu5', '2', '11B1', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['chieu5', '3', '11B1', 'SINH', 'T. T-PHÁT', 'nan'],
+    ['chieu5', '4', '11B1', 'TOÁN', 'T. KHANG', 'nan'],
+    ['chieu5', '5', '11B1', 'ANH', 'C. THÁI', 'nan'],
+    ['chieu6', '1', '11B1', 'AVBN', 'AVBN3', 'nan'],
+    ['chieu6', '2', '11B1', 'AVBN', 'AVBN3', 'nan'],
+    ['chieu6', '3', '11B1', 'HOÁ', 'C. HIẾN', 'nan'],
+    ['chieu6', '4', '11B1', 'VĂN', 'C. NGỌC', 'nan'],
+    ['chieu6', '5', '11B1', 'VĂN', 'C. NGỌC', 'nan'],
+    ['sang3', '1', '11B1', 'HOÁ', 'C. HIẾN', 'nan'],
+    ['sang3', '2', '11B1', 'HOÁ', 'C. HIẾN', 'nan'],
+    ['sang5', '1', '11B1', 'TIN', 'C. PHỤNG', 'PM3'],
+    ['sang5', '2', '11B1', 'TIN', 'C. PHỤNG', 'PM3'],
+    ['sang6', '1', '11B1', 'MOS', 'T. HIỀN', 'PM2'],
+    ['sang6', '2', '11B1', 'MOS', 'T. HIỀN', 'PM2'],
+    ['chieu2', '1', '11B2', 'SINH', 'T. V-PHÁT', 'nan'],
+    ['chieu2', '2', '11B2', 'SINH', 'T. V-PHÁT', 'nan'],
+    ['chieu2', '3', '11B2', 'ANH', 'C. MAI', 'nan'],
+    ['chieu2', '4', '11B2', 'TNHN-1', 'T. ANH', 'nan'],
+    ['chieu2', '5', '11B2', 'CC', 'T. ANH', 'nan'],
+    ['chieu3', '1', '11B2', 'HOÁ', 'C. NGÂN (H)', 'nan'],
+    ['chieu3', '2', '11B2', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['chieu3', '3', '11B2', 'SINH', 'T. V-PHÁT', 'nan'],
+    ['chieu3', '4', '11B2', 'TNHN', 'C. TRINH', 'nan'],
+    ['chieu3', '5', '11B2', 'TNHN', 'C. TRINH', 'nan'],
+    ['chieu4', '1', '11B2', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['chieu4', '2', '11B2', 'GDĐP', 'T. SANG', 'nan'],
+    ['chieu4', '3', '11B2', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['chieu4', '4', '11B2', 'ANH', 'C. MAI', 'nan'],
+    ['chieu4', '5', '11B2', 'ANH', 'C. MAI', 'nan'],
+    ['chieu5', '1', '11B2', 'SỬ', 'T. THANH', 'nan'],
+    ['chieu5', '2', '11B2', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['chieu5', '3', '11B2', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['chieu5', '4', '11B2', 'TIN', 'C. NGÂN (TI)', 'PM3'],
+    ['chieu5', '5', '11B2', 'TIN', 'C. NGÂN (TI)', 'PM3'],
+    ['chieu6', '1', '11B2', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['chieu6', '2', '11B2', 'MOS', 'C. NGÂN (TI)', 'PM1'],
+    ['chieu6', '3', '11B2', 'MOS', 'C. NGÂN (TI)', 'PM1'],
+    ['chieu6', '4', '11B2', 'VĂN', 'T. ANH', 'nan'],
+    ['chieu6', '5', '11B2', 'VĂN', 'T. ANH', 'nan'],
+    ['sang3', '1', '11B2', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['sang3', '2', '11B2', 'VĂN', 'T. ANH', 'nan'],
+    ['sang5', '1', '11B2', 'AVBN', 'AVBN4', 'nan'],
+    ['sang5', '2', '11B2', 'AVBN', 'AVBN4', 'nan'],
+    ['sang6', '1', '11B2', 'HOÁ', 'C. NGÂN (H)', 'nan'],
+    ['sang6', '2', '11B2', 'HOÁ', 'C. NGÂN (H)', 'nan'],
+    ['chieu2', '1', '11B3', 'ANH', 'C. OANH', 'nan'],
+    ['chieu2', '2', '11B3', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['chieu2', '3', '11B3', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['chieu2', '4', '11B3', 'TNHN-1', 'C. HOA (S)', 'nan'],
+    ['chieu2', '5', '11B3', 'CC', 'C. HOA (S)', 'nan'],
+    ['chieu3', '1', '11B3', 'AVBN', 'AVBN4', 'nan'],
+    ['chieu3', '2', '11B3', 'AVBN', 'AVBN4', 'nan'],
+    ['chieu3', '3', '11B3', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['chieu3', '4', '11B3', 'TNHN', 'T. HUY', 'nan'],
+    ['chieu3', '5', '11B3', 'TNHN', 'T. HUY', 'nan'],
+    ['chieu4', '1', '11B3', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['chieu4', '2', '11B3', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['chieu4', '3', '11B3', 'GDĐP', 'T. SANG', 'nan'],
+    ['chieu4', '4', '11B3', 'MOS', 'C. NGÂN (TI)', 'PM2'],
+    ['chieu4', '5', '11B3', 'MOS', 'C. NGÂN (TI)', 'PM2'],
+    ['chieu5', '1', '11B3', 'HOÁ', 'C. THƯ', 'nan'],
+    ['chieu5', '2', '11B3', 'HOÁ', 'C. THƯ', 'nan'],
+    ['chieu5', '3', '11B3', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['chieu5', '4', '11B3', 'ANH', 'C. OANH', 'nan'],
+    ['chieu5', '5', '11B3', 'ANH', 'C. OANH', 'nan'],
+    ['chieu6', '1', '11B3', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['chieu6', '2', '11B3', 'HOÁ', 'C. THƯ', 'nan'],
+    ['chieu6', '3', '11B3', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['chieu6', '4', '11B3', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['chieu6', '5', '11B3', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['sang3', '1', '11B3', 'SINH', 'C. HOA (S)', 'nan'],
+    ['sang3', '2', '11B3', 'SINH', 'C. HOA (S)', 'nan'],
+    ['sang5', '1', '11B3', 'SINH', 'C. HOA (S)', 'nan'],
+    ['sang5', '2', '11B3', 'SỬ', 'T. THANH', 'nan'],
+    ['sang6', '1', '11B3', 'TIN', 'C. NGÂN (TI)', 'PM4'],
+    ['sang6', '2', '11B3', 'TIN', 'C. NGÂN (TI)', 'PM4'],
+    ['chieu2', '1', '11C', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['chieu2', '2', '11C', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu2', '3', '11C', 'SINH', 'T. T-PHÁT', 'nan'],
+    ['chieu2', '4', '11C', 'TNHN-1', 'C. UYÊN (V)', 'nan'],
+    ['chieu2', '5', '11C', 'CC', 'C. UYÊN (V)', 'nan'],
+    ['chieu3', '1', '11C', 'ANH', 'C. TRINH', 'nan'],
+    ['chieu3', '2', '11C', 'GDQP', 'T. DŨNG', 'nan'],
+    ['chieu3', '3', '11C', 'KTPL', 'C. THẮM', 'nan'],
+    ['chieu3', '4', '11C', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu3', '5', '11C', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu4', '1', '11C', 'ĐỊA', 'T. NAM', 'nan'],
+    ['chieu4', '2', '11C', 'MOS', 'C. NGÂN (TI)', 'PM2'],
+    ['chieu4', '3', '11C', 'MOS', 'C. NGÂN (TI)', 'PM2'],
+    ['chieu4', '4', '11C', 'GDĐP', 'T. SANG', 'nan'],
+    ['chieu4', '5', '11C', 'SỬ', 'T. THÀNH', 'nan'],
+    ['chieu5', '1', '11C', 'SỬ', 'T. THÀNH', 'nan'],
+    ['chieu5', '2', '11C', 'SINH', 'T. T-PHÁT', 'nan'],
+    ['chieu5', '3', '11C', 'ANH', 'C. TRINH', 'nan'],
+    ['chieu5', '4', '11C', 'ANH', 'C. TRINH', 'nan'],
+    ['chieu5', '5', '11C', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu6', '1', '11C', 'AVBN', 'AVBN4', 'nan'],
+    ['chieu6', '2', '11C', 'AVBN', 'AVBN4', 'nan'],
+    ['chieu6', '3', '11C', 'ĐỊA', 'T. NAM', 'nan'],
+    ['chieu6', '4', '11C', 'ĐỊA', 'T. NAM', 'nan'],
+    ['chieu6', '5', '11C', 'KTPL', 'C. THẮM', 'nan'],
+    ['sang3', '1', '11C', 'TIN', 'C. NGÂN (TI)', 'PM5'],
+    ['sang3', '2', '11C', 'TIN', 'C. NGÂN (TI)', 'PM5'],
+    ['sang5', '1', '11C', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['sang5', '2', '11C', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['sang6', '1', '11C', 'TNHN', 'T. THÁI', 'nan'],
+    ['sang6', '2', '11C', 'TNHN', 'T. THÁI', 'nan'],
+    ['chieu2', '1', '11Đ1', 'ĐỊA', 'T. NAM', 'nan'],
+    ['chieu2', '2', '11Đ1', 'AVBN', 'AVBN4', 'nan'],
+    ['chieu2', '3', '11Đ1', 'AVBN', 'AVBN4', 'nan'],
+    ['chieu2', '4', '11Đ1', 'TNHN-1', 'T. NAM', 'nan'],
+    ['chieu2', '5', '11Đ1', 'CC', 'T. NAM', 'nan'],
+    ['chieu3', '1', '11Đ1', 'GDQP', 'T. DŨNG', 'nan'],
+    ['chieu3', '2', '11Đ1', 'GDĐP', 'C. LỆ', 'nan'],
+    ['chieu3', '3', '11Đ1', 'ANH', 'C. HƯƠNG (A)', 'nan'],
+    ['chieu3', '4', '11Đ1', 'ANH', 'C. HƯƠNG (A)', 'nan'],
+    ['chieu3', '5', '11Đ1', 'KTPL', 'C. QUYỀN', 'nan'],
+    ['chieu4', '1', '11Đ1', 'TOÁN', 'T. TÀI', 'nan'],
+    ['chieu4', '2', '11Đ1', 'MOS', 'C. NHÀN', 'PM1'],
+    ['chieu4', '3', '11Đ1', 'MOS', 'C. NHÀN', 'PM1'],
+    ['chieu4', '4', '11Đ1', 'KTPL', 'C. QUYỀN', 'nan'],
+    ['chieu4', '5', '11Đ1', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['chieu5', '1', '11Đ1', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['chieu5', '2', '11Đ1', 'TIN', 'C. NHÀN', 'PM2'],
+    ['chieu5', '3', '11Đ1', 'TIN', 'C. NHÀN', 'PM2'],
+    ['chieu5', '4', '11Đ1', 'ANH', 'C. HƯƠNG (A)', 'nan'],
+    ['chieu5', '5', '11Đ1', 'SỬ', 'T. THÀNH', 'nan'],
+    ['chieu6', '1', '11Đ1', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['chieu6', '2', '11Đ1', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['chieu6', '3', '11Đ1', 'SỬ', 'T. THÀNH', 'nan'],
+    ['chieu6', '4', '11Đ1', 'TNHN', 'T. HUY', 'nan'],
+    ['chieu6', '5', '11Đ1', 'TNHN', 'T. HUY', 'nan'],
+    ['sang3', '1', '11Đ1', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['sang3', '2', '11Đ1', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['sang5', '1', '11Đ1', 'ĐỊA', 'T. NAM', 'nan'],
+    ['sang5', '2', '11Đ1', 'ĐỊA', 'T. NAM', 'nan'],
+    ['sang6', '1', '11Đ1', 'TOÁN', 'T. TÀI', 'nan'],
+    ['sang6', '2', '11Đ1', 'TOÁN', 'T. TÀI', 'nan'],
+    ['chieu2', '1', '11Đ2', 'TNHN', 'C. CHI (KTPL)', 'nan'],
+    ['chieu2', '2', '11Đ2', 'TNHN', 'C. CHI (KTPL)', 'nan'],
+    ['chieu2', '3', '11Đ2', 'VĂN', 'T. ANH', 'nan'],
+    ['chieu2', '4', '11Đ2', 'TNHN-1', 'C. CHI (KTPL)', 'nan'],
+    ['chieu2', '5', '11Đ2', 'CC', 'C. CHI (KTPL)', 'nan'],
+    ['chieu3', '1', '11Đ2', 'TIN', 'C. Ý', 'PM2'],
+    ['chieu3', '2', '11Đ2', 'TIN', 'C. Ý', 'PM2'],
+    ['chieu3', '3', '11Đ2', 'VĂN', 'T. ANH', 'nan'],
+    ['chieu3', '4', '11Đ2', 'VĂN', 'T. ANH', 'nan'],
+    ['chieu3', '5', '11Đ2', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['chieu4', '1', '11Đ2', 'SỬ', 'T. TẤN (S)', 'nan'],
+    ['chieu4', '2', '11Đ2', 'GDQP', 'T. DŨNG', 'nan'],
+    ['chieu4', '3', '11Đ2', 'ANH', 'C. HẠNH (A)', 'nan'],
+    ['chieu4', '4', '11Đ2', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['chieu4', '5', '11Đ2', 'KTPL', 'C. CHI (KTPL)', 'nan'],
+    ['chieu5', '1', '11Đ2', 'ĐỊA', 'C. LÝ', 'nan'],
+    ['chieu5', '2', '11Đ2', 'ĐỊA', 'C. LÝ', 'nan'],
+    ['chieu5', '3', '11Đ2', 'ANH', 'C. HẠNH (A)', 'nan'],
+    ['chieu5', '4', '11Đ2', 'ANH', 'C. HẠNH (A)', 'nan'],
+    ['chieu5', '5', '11Đ2', 'VĂN', 'T. ANH', 'nan'],
+    ['chieu6', '1', '11Đ2', 'SỬ', 'T. TẤN (S)', 'nan'],
+    ['chieu6', '2', '11Đ2', 'CÔNG NGHỆ', 'T. HIỂN', 'nan'],
+    ['chieu6', '3', '11Đ2', 'ĐỊA', 'C. LÝ', 'nan'],
+    ['chieu6', '4', '11Đ2', 'MOS', 'C. Ý', 'PM5'],
+    ['chieu6', '5', '11Đ2', 'MOS', 'C. Ý', 'PM5'],
+    ['sang3', '1', '11Đ2', 'AVBN', 'AVBN4', 'nan'],
+    ['sang3', '2', '11Đ2', 'AVBN', 'AVBN4', 'nan'],
+    ['sang5', '1', '11Đ2', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['sang5', '2', '11Đ2', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['sang6', '1', '11Đ2', 'KTPL', 'C. CHI (KTPL)', 'nan'],
+    ['sang6', '2', '11Đ2', 'GDĐP', 'C. LỆ', 'nan'],
+    ['chieu2', '1', '11H', 'MOS', 'C. Ý', 'PM3'],
+    ['chieu2', '2', '11H', 'MOS', 'C. Ý', 'PM3'],
+    ['chieu2', '3', '11H', 'TOÁN', 'T. KHANG', 'nan'],
+    ['chieu2', '4', '11H', 'TNHN-1', 'C. THỦY', 'nan'],
+    ['chieu2', '5', '11H', 'CC', 'C. THỦY', 'nan'],
+    ['chieu3', '1', '11H', 'HOÁ', 'T. HUY', 'nan'],
+    ['chieu3', '2', '11H', 'VĂN', 'C. NGỌC', 'nan'],
+    ['chieu3', '3', '11H', 'GDĐP', 'C. LỆ', 'nan'],
+    ['chieu3', '4', '11H', 'KTPL', 'C. QUYỀN', 'nan'],
+    ['chieu3', '5', '11H', 'GDQP', 'T. DŨNG', 'nan'],
+    ['chieu4', '1', '11H', 'ĐỊA', 'T. HÒA', 'nan'],
+    ['chieu4', '2', '11H', 'ĐỊA', 'T. HÒA', 'nan'],
+    ['chieu4', '3', '11H', 'SỬ', 'T. TẤN (S)', 'nan'],
+    ['chieu4', '4', '11H', 'TOÁN', 'T. KHANG', 'nan'],
+    ['chieu4', '5', '11H', 'TOÁN', 'T. KHANG', 'nan'],
+    ['chieu5', '1', '11H', 'ANH', 'C. THỦY', 'nan'],
+    ['chieu5', '2', '11H', 'ANH', 'C. THỦY', 'nan'],
+    ['chieu5', '3', '11H', 'VĂN', 'C. NGỌC', 'nan'],
+    ['chieu5', '4', '11H', 'VĂN', 'C. NGỌC', 'nan'],
+    ['chieu5', '5', '11H', 'TOÁN', 'T. KHANG', 'nan'],
+    ['chieu6', '1', '11H', 'HOÁ', 'T. HUY', 'nan'],
+    ['chieu6', '2', '11H', 'HOÁ', 'T. HUY', 'nan'],
+    ['chieu6', '3', '11H', 'ĐỊA', 'T. HÒA', 'nan'],
+    ['chieu6', '4', '11H', 'TNHN', 'T. HIỂN', 'nan'],
+    ['chieu6', '5', '11H', 'TNHN', 'T. HIỂN', 'nan'],
+    ['sang4', '3', '11H', 'ANH', 'C. THỦY', 'nan'],
+    ['sang4', '4', '11H', 'KTPL', 'C. QUYỀN', 'nan'],
+    ['sang5', '3', '11H', 'TIN', 'C. Ý', 'PM1'],
+    ['sang5', '4', '11H', 'TIN', 'C. Ý', 'PM1'],
+    ['sang6', '3', '11H', 'AVBN', 'AVBN4', 'nan'],
+    ['sang6', '4', '11H', 'AVBN', 'AVBN4', 'nan'],
+    ['chieu2', '1', '11L1', 'TNHN', 'C. HIẾN', 'nan'],
+    ['chieu2', '2', '11L1', 'TNHN', 'C. HIẾN', 'nan'],
+    ['chieu2', '3', '11L1', 'KTPL', 'C. CHI (KTPL)', 'nan'],
+    ['chieu2', '4', '11L1', 'TNHN-1', 'C. OANH', 'nan'],
+    ['chieu2', '5', '11L1', 'CC', 'C. OANH', 'nan'],
+    ['chieu3', '1', '11L1', 'MOS', 'T. VIỆT', 'PM1'],
+    ['chieu3', '2', '11L1', 'MOS', 'T. VIỆT', 'PM1'],
+    ['chieu3', '3', '11L1', 'TIN', 'C. Ý', 'PM2'],
+    ['chieu3', '4', '11L1', 'ANH', 'C. OANH', 'nan'],
+    ['chieu3', '5', '11L1', 'ANH', 'C. OANH', 'nan'],
+    ['chieu4', '1', '11L1', 'AVBN', 'AVBN2', 'nan'],
+    ['chieu4', '2', '11L1', 'AVBN', 'AVBN2', 'nan'],
+    ['chieu4', '3', '11L1', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['chieu4', '4', '11L1', 'KTPL', 'C. CHI (KTPL)', 'nan'],
+    ['chieu4', '5', '11L1', 'CÔNG NGHỆ', 'T. THÁI', 'nan'],
+    ['chieu5', '1', '11L1', 'ANH', 'C. OANH', 'nan'],
+    ['chieu5', '2', '11L1', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['chieu5', '3', '11L1', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['chieu5', '4', '11L1', 'LÝ', 'C. TÂM (L)', 'nan'],
+    ['chieu5', '5', '11L1', 'LÝ', 'C. TÂM (L)', 'nan'],
+    ['chieu6', '1', '11L1', 'VĂN', 'T. TÙNG', 'nan'],
+    ['chieu6', '2', '11L1', 'VĂN', 'T. TÙNG', 'nan'],
+    ['chieu6', '3', '11L1', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['chieu6', '4', '11L1', 'GDĐP', 'C. LỆ', 'nan'],
+    ['chieu6', '5', '11L1', 'SỬ', 'T. TẤN (S)', 'nan'],
+    ['sang3', '1', '11L1', 'LÝ', 'C. TÂM (L)', 'nan'],
+    ['sang3', '2', '11L1', 'CÔNG NGHỆ', 'T. THÁI', 'nan'],
+    ['sang5', '1', '11L1', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['sang5', '2', '11L1', 'VĂN', 'T. TÙNG', 'nan'],
+    ['sang6', '1', '11L1', 'TIN', 'C. Ý', 'PM1'],
+    ['sang6', '2', '11L1', 'TIN', 'C. Ý', 'PM1'],
+    ['chieu2', '1', '11L2', 'TOÁN', 'C. THÚY', 'nan'],
+    ['chieu2', '2', '11L2', 'TOÁN', 'C. THÚY', 'nan'],
+    ['chieu2', '3', '11L2', 'TIN', 'C. Ý', 'PM3'],
+    ['chieu2', '4', '11L2', 'TNHN-1', 'C. XUÂN', 'nan'],
+    ['chieu2', '5', '11L2', 'CC', 'C. XUÂN', 'nan'],
+    ['chieu3', '1', '11L2', 'KTPL', 'C. QUYỀN', 'nan'],
+    ['chieu3', '2', '11L2', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu3', '3', '11L2', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu3', '4', '11L2', 'ANH', 'C. XUÂN', 'nan'],
+    ['chieu3', '5', '11L2', 'ANH', 'C. XUÂN', 'nan'],
+    ['chieu4', '1', '11L2', 'CÔNG NGHỆ', 'T. THÁI', 'nan'],
+    ['chieu4', '2', '11L2', 'TOÁN', 'C. THÚY', 'nan'],
+    ['chieu4', '3', '11L2', 'ANH', 'C. XUÂN', 'nan'],
+    ['chieu4', '4', '11L2', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['chieu4', '5', '11L2', 'KTPL', 'C. QUYỀN', 'nan'],
+    ['chieu5', '1', '11L2', 'VĂN', 'C. UYÊN (V)', 'nan'],
+    ['chieu5', '2', '11L2', 'LÝ', 'T. SANG (L)', 'nan'],
+    ['chieu5', '3', '11L2', 'LÝ', 'T. SANG (L)', 'nan'],
+    ['chieu5', '4', '11L2', 'TIN', 'C. Ý', 'PM1'],
+    ['chieu5', '5', '11L2', 'TIN', 'C. Ý', 'PM1'],
+    ['chieu6', '1', '11L2', 'GDĐP', 'C. LỆ', 'nan'],
+    ['chieu6', '2', '11L2', 'TOÁN', 'C. THÚY', 'nan'],
+    ['chieu6', '3', '11L2', 'LÝ', 'T. SANG (L)', 'nan'],
+    ['chieu6', '4', '11L2', 'SỬ', 'T. TẤN (S)', 'nan'],
+    ['chieu6', '5', '11L2', 'CÔNG NGHỆ', 'T. THÁI', 'nan'],
+    ['sang3', '1', '11L2', 'AVBN', 'AVBN2', 'nan'],
+    ['sang3', '2', '11L2', 'AVBN', 'AVBN2', 'nan'],
+    ['sang5', '1', '11L2', 'TNHN', 'T. VĂN', 'nan'],
+    ['sang5', '2', '11L2', 'TNHN', 'T. VĂN', 'nan'],
+    ['sang6', '1', '11L2', 'MOS', 'T. VIỆT', 'PM3'],
+    ['sang6', '2', '11L2', 'MOS', 'T. VIỆT', 'PM3'],
+    ['chieu2', '1', '11L3', 'TNHN', 'T. VĂN', 'nan'],
+    ['chieu2', '2', '11L3', 'TNHN', 'T. VĂN', 'nan'],
+    ['chieu2', '3', '11L3', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['chieu2', '4', '11L3', 'TNHN-1', 'C. THÁI', 'nan'],
+    ['chieu2', '5', '11L3', 'CC', 'C. THÁI', 'nan'],
+    ['chieu3', '1', '11L3', 'KTPL', 'C. THẮM', 'nan'],
+    ['chieu3', '2', '11L3', 'VĂN', 'C. ÁNH', 'nan'],
+    ['chieu3', '3', '11L3', 'VĂN', 'C. ÁNH', 'nan'],
+    ['chieu3', '4', '11L3', 'TIN', 'C. NGÂN (TI)', 'PM5'],
+    ['chieu3', '5', '11L3', 'TIN', 'C. NGÂN (TI)', 'PM5'],
+    ['chieu4', '1', '11L3', 'TIN', 'C. NGÂN (TI)', 'PM2'],
+    ['chieu4', '2', '11L3', 'CÔNG NGHỆ', 'T. THÁI', 'nan'],
+    ['chieu4', '3', '11L3', 'AVBN', 'AVBN2', 'nan'],
+    ['chieu4', '4', '11L3', 'AVBN', 'AVBN2', 'nan'],
+    ['chieu4', '5', '11L3', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['chieu5', '1', '11L3', 'SỬ', 'C. HỒNG (S)', 'nan'],
+    ['chieu5', '2', '11L3', 'LÝ', 'T. TÚ', 'nan'],
+    ['chieu5', '3', '11L3', 'LÝ', 'T. TÚ', 'nan'],
+    ['chieu5', '4', '11L3', 'ANH', 'C. THÁI', 'nan'],
+    ['chieu5', '5', '11L3', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['chieu6', '1', '11L3', 'KTPL', 'C. THẮM', 'nan'],
+    ['chieu6', '2', '11L3', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['chieu6', '3', '11L3', 'TOÁN', 'T. THẠNH', 'nan'],
+    ['chieu6', '4', '11L3', 'CÔNG NGHỆ', 'T. THÁI', 'nan'],
+    ['chieu6', '5', '11L3', 'LÝ', 'T. TÚ', 'nan'],
+    ['sang3', '1', '11L3', 'ANH', 'C. THÁI', 'nan'],
+    ['sang3', '2', '11L3', 'ANH', 'C. THÁI', 'nan'],
+    ['sang5', '1', '11L3', 'MOS', 'C. Ý', 'PM1'],
+    ['sang5', '2', '11L3', 'MOS', 'C. Ý', 'PM1'],
+    ['sang6', '1', '11L3', 'GDĐP', 'C. LỆ', 'nan'],
+    ['sang6', '2', '11L3', 'VĂN', 'C. ÁNH', 'nan'],
+    ['chieu2', '1', '11L4', 'MOS', 'T. HIỀN', 'PM5'],
+    ['chieu2', '2', '11L4', 'MOS', 'T. HIỀN', 'PM5'],
+    ['chieu2', '3', '11L4', 'TOÁN', 'C. DUNG', 'nan'],
+    ['chieu2', '4', '11L4', 'TNHN-1', 'T. SƠN', 'nan'],
+    ['chieu2', '5', '11L4', 'CC', 'T. SƠN', 'nan'],
+    ['chieu3', '1', '11L4', 'CÔNG NGHỆ', 'T. SƠN', 'nan'],
+    ['chieu3', '2', '11L4', 'AVBN', 'AVBN2', 'nan'],
+    ['chieu3', '3', '11L4', 'AVBN', 'AVBN2', 'nan'],
+    ['chieu3', '4', '11L4', 'LÝ', 'C. HỒNG (L)', 'nan'],
+    ['chieu3', '5', '11L4', 'KTPL', 'C. THẮM', 'nan'],
+    ['chieu4', '1', '11L4', 'TIN', 'C. PHỤNG', 'PM3'],
+    ['chieu4', '2', '11L4', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['chieu4', '3', '11L4', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['chieu4', '4', '11L4', 'SỬ', 'C. HỒNG (S)', 'nan'],
+    ['chieu4', '5', '11L4', 'GDĐP', 'C. LỆ', 'nan'],
+    ['chieu5', '1', '11L4', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['chieu5', '2', '11L4', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['chieu5', '3', '11L4', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['chieu5', '4', '11L4', 'TIN', 'C. PHỤNG', 'PM5'],
+    ['chieu5', '5', '11L4', 'TIN', 'C. PHỤNG', 'PM5'],
+    ['chieu6', '1', '11L4', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['chieu6', '2', '11L4', 'VĂN', 'C. HẠNH (V)', 'nan'],
+    ['chieu6', '3', '11L4', 'KTPL', 'C. THẮM', 'nan'],
+    ['chieu6', '4', '11L4', 'CÔNG NGHỆ', 'T. SƠN', 'nan'],
+    ['chieu6', '5', '11L4', 'TOÁN', 'C. DUNG', 'nan'],
+    ['sang3', '1', '11L4', 'TNHN', 'T. VĂN', 'nan'],
+    ['sang3', '2', '11L4', 'TNHN', 'T. VĂN', 'nan'],
+    ['sang5', '1', '11L4', 'TOÁN', 'C. DUNG', 'nan'],
+    ['sang5', '2', '11L4', 'TOÁN', 'C. DUNG', 'nan'],
+    ['sang6', '1', '11L4', 'LÝ', 'C. HỒNG (L)', 'nan'],
+    ['sang6', '2', '11L4', 'LÝ', 'C. HỒNG (L)', 'nan'],
+    ['chieu3', '2', '12A1', 'TNHN', 'T. LUÂN', 'nan'],
+    ['chieu3', '3', '12A1', 'TNHN', 'T. LUÂN', 'nan'],
+    ['chieu5', '2', '12A1', 'SINH', 'C. LIÊM', 'nan'],
+    ['chieu5', '3', '12A1', 'GDĐP', 'C. HOA (S)', 'nan'],
+    ['chieu6', '2', '12A1', 'VĂN', 'C. ÁNH', 'nan'],
+    ['chieu6', '3', '12A1', 'VĂN', 'C. ÁNH', 'nan'],
+    ['sang2', '1', '12A1', 'CC', 'T. LUÂN', 'nan'],
+    ['sang2', '2', '12A1', 'TNHN-1', 'T. LUÂN', 'nan'],
+    ['sang2', '3', '12A1', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang2', '4', '12A1', 'SINH', 'C. LIÊM', 'nan'],
+    ['sang2', '5', '12A1', 'HOÁ', 'T. LUÂN', 'nan'],
+    ['sang3', '1', '12A1', 'VĂN', 'C. ÁNH', 'nan'],
+    ['sang3', '2', '12A1', 'HOÁ', 'T. LUÂN', 'nan'],
+    ['sang3', '3', '12A1', 'HOÁ', 'T. LUÂN', 'nan'],
+    ['sang3', '4', '12A1', 'LÝ', 'C. TÂM (L)', 'nan'],
+    ['sang3', '5', '12A1', 'LÝ', 'C. TÂM (L)', 'nan'],
+    ['sang4', '1', '12A1', 'TOÁN', 'C. DUNG', 'nan'],
+    ['sang4', '2', '12A1', 'TOÁN', 'C. DUNG', 'nan'],
+    ['sang4', '3', '12A1', 'TIN', 'C. NGÂN (TI)', 'PM2'],
+    ['sang4', '4', '12A1', 'TIN', 'C. NGÂN (TI)', 'PM2'],
+    ['sang4', '5', '12A1', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['sang5', '1', '12A1', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang5', '2', '12A1', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang5', '3', '12A1', 'TOÁN', 'C. DUNG', 'nan'],
+    ['sang5', '4', '12A1', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['sang5', '5', '12A1', 'VĂN', 'C. ÁNH', 'nan'],
+    ['sang6', '1', '12A1', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['sang6', '2', '12A1', 'TOÁN', 'C. DUNG', 'nan'],
+    ['sang6', '3', '12A1', 'TOÁN', 'C. DUNG', 'nan'],
+    ['sang6', '4', '12A1', 'LÝ', 'C. TÂM (L)', 'nan'],
+    ['chieu3', '2', '12A2', 'ANH', 'C. TRINH', 'nan'],
+    ['chieu3', '3', '12A2', 'ANH', 'C. TRINH', 'nan'],
+    ['chieu5', '2', '12A2', 'GDĐP', 'C. HOA (S)', 'nan'],
+    ['chieu5', '3', '12A2', 'TOÁN', 'T. THU', 'nan'],
+    ['chieu6', '2', '12A2', 'TIN', 'C. TIỀN', 'PM3'],
+    ['chieu6', '3', '12A2', 'TIN', 'C. TIỀN', 'PM3'],
+    ['sang2', '1', '12A2', 'CC', 'C. HỒNG (L)', 'nan'],
+    ['sang2', '2', '12A2', 'TNHN-1', 'C. HỒNG (L)', 'nan'],
+    ['sang2', '3', '12A2', 'LÝ', 'C. HỒNG (L)', 'nan'],
+    ['sang2', '4', '12A2', 'LÝ', 'C. HỒNG (L)', 'nan'],
+    ['sang2', '5', '12A2', 'VĂN', 'C. THẢO', 'nan'],
+    ['sang3', '1', '12A2', 'VĂN', 'C. THẢO', 'nan'],
+    ['sang3', '2', '12A2', 'VĂN', 'C. THẢO', 'nan'],
+    ['sang3', '3', '12A2', 'LÝ', 'C. HỒNG (L)', 'nan'],
+    ['sang3', '4', '12A2', 'TNHN', 'C. HỒNG (L)', 'nan'],
+    ['sang3', '5', '12A2', 'TNHN', 'C. HỒNG (L)', 'nan'],
+    ['sang4', '1', '12A2', 'TOÁN', 'T. THU', 'nan'],
+    ['sang4', '2', '12A2', 'TOÁN', 'T. THU', 'nan'],
+    ['sang4', '3', '12A2', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['sang4', '4', '12A2', 'ĐỊA', 'T. HÒA', 'nan'],
+    ['sang4', '5', '12A2', 'ANH', 'C. TRINH', 'nan'],
+    ['sang5', '1', '12A2', 'VĂN', 'C. THẢO', 'nan'],
+    ['sang5', '2', '12A2', 'HOÁ', 'T. HUY', 'nan'],
+    ['sang5', '3', '12A2', 'HOÁ', 'T. HUY', 'nan'],
+    ['sang5', '4', '12A2', 'ĐỊA', 'T. HÒA', 'nan'],
+    ['sang5', '5', '12A2', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['sang6', '1', '12A2', 'HOÁ', 'T. HUY', 'nan'],
+    ['sang6', '2', '12A2', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['sang6', '3', '12A2', 'TOÁN', 'T. THU', 'nan'],
+    ['sang6', '4', '12A2', 'TOÁN', 'T. THU', 'nan'],
+    ['chieu3', '2', '12A3', 'GDĐP', 'C. HOA (S)', 'nan'],
+    ['chieu3', '3', '12A3', 'HOÁ', 'T. VINH (H)', 'nan'],
+    ['chieu5', '2', '12A3', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['chieu5', '3', '12A3', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['chieu6', '2', '12A3', 'TOÁN', 'T. LÂM', 'nan'],
+    ['chieu6', '3', '12A3', 'TOÁN', 'T. LÂM', 'nan'],
+    ['sang2', '1', '12A3', 'CC', 'T. VINH (H)', 'nan'],
+    ['sang2', '2', '12A3', 'TNHN-1', 'T. VINH (H)', 'nan'],
+    ['sang2', '3', '12A3', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['sang2', '4', '12A3', 'TOÁN', 'T. LÂM', 'nan'],
+    ['sang2', '5', '12A3', 'SỬ', 'C. NÊ', 'nan'],
+    ['sang3', '1', '12A3', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['sang3', '2', '12A3', 'LÝ', 'C. LAN (L)', 'nan'],
+    ['sang3', '3', '12A3', 'LÝ', 'C. LAN (L)', 'nan'],
+    ['sang3', '4', '12A3', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['sang3', '5', '12A3', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['sang4', '1', '12A3', 'TIN', 'C. Ý', 'PM4'],
+    ['sang4', '2', '12A3', 'TIN', 'C. Ý', 'PM4'],
+    ['sang4', '3', '12A3', 'TOÁN', 'T. LÂM', 'nan'],
+    ['sang4', '4', '12A3', 'TOÁN', 'T. LÂM', 'nan'],
+    ['sang4', '5', '12A3', 'ĐỊA', 'T. MINH (Đ)', 'nan'],
+    ['sang5', '1', '12A3', 'TNHN', 'T. VINH (H)', 'nan'],
+    ['sang5', '2', '12A3', 'TNHN', 'T. VINH (H)', 'nan'],
+    ['sang5', '3', '12A3', 'HOÁ', 'T. VINH (H)', 'nan'],
+    ['sang5', '4', '12A3', 'HOÁ', 'T. VINH (H)', 'nan'],
+    ['sang5', '5', '12A3', 'ĐỊA', 'T. MINH (Đ)', 'nan'],
+    ['sang6', '1', '12A3', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['sang6', '2', '12A3', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['sang6', '3', '12A3', 'LÝ', 'C. LAN (L)', 'nan'],
+    ['sang6', '4', '12A3', 'SỬ', 'C. NÊ', 'nan'],
+    ['chieu3', '2', '12A4', 'ANH', 'C. MAI', 'nan'],
+    ['chieu3', '3', '12A4', 'GDĐP', 'C. HOA (S)', 'nan'],
+    ['chieu5', '2', '12A4', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['chieu5', '3', '12A4', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['chieu6', '2', '12A4', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['chieu6', '3', '12A4', 'HOÁ', 'C. THƯ', 'nan'],
+    ['sang2', '1', '12A4', 'CC', 'C. HOA (V)', 'nan'],
+    ['sang2', '2', '12A4', 'TNHN-1', 'C. HOA (V)', 'nan'],
+    ['sang2', '3', '12A4', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['sang2', '4', '12A4', 'HOÁ', 'C. THƯ', 'nan'],
+    ['sang2', '5', '12A4', 'HOÁ', 'C. THƯ', 'nan'],
+    ['sang3', '1', '12A4', 'TNHN', 'C. HOA (V)', 'nan'],
+    ['sang3', '2', '12A4', 'TNHN', 'C. HOA (V)', 'nan'],
+    ['sang3', '3', '12A4', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['sang3', '4', '12A4', 'TIN', 'C. Ý', 'PM4'],
+    ['sang3', '5', '12A4', 'TIN', 'C. Ý', 'PM4'],
+    ['sang4', '1', '12A4', 'SỬ', 'C. NÊ', 'nan'],
+    ['sang4', '2', '12A4', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['sang4', '3', '12A4', 'ANH', 'C. MAI', 'nan'],
+    ['sang4', '4', '12A4', 'ANH', 'C. MAI', 'nan'],
+    ['sang4', '5', '12A4', 'ĐỊA', 'C. HƯƠNG (Đ)', 'nan'],
+    ['sang5', '1', '12A4', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['sang5', '2', '12A4', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['sang5', '3', '12A4', 'SỬ', 'C. NÊ', 'nan'],
+    ['sang5', '4', '12A4', 'LÝ', 'C. GIANG (L)', 'nan'],
+    ['sang5', '5', '12A4', 'LÝ', 'C. GIANG (L)', 'nan'],
+    ['sang6', '1', '12A4', 'LÝ', 'C. GIANG (L)', 'nan'],
+    ['sang6', '2', '12A4', 'ĐỊA', 'C. HƯƠNG (Đ)', 'nan'],
+    ['sang6', '3', '12A4', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['sang6', '4', '12A4', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['chieu3', '2', '12A5', 'LÝ', 'C. TRÂM', 'nan'],
+    ['chieu3', '3', '12A5', 'LÝ', 'C. TRÂM', 'nan'],
+    ['chieu5', '2', '12A5', 'VĂN', 'C. GIANG', 'nan'],
+    ['chieu5', '3', '12A5', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['chieu6', '2', '12A5', 'VĂN', 'C. GIANG', 'nan'],
+    ['chieu6', '3', '12A5', 'VĂN', 'C. GIANG', 'nan'],
+    ['sang2', '1', '12A5', 'CC', 'C. TRÂM', 'nan'],
+    ['sang2', '2', '12A5', 'TNHN-1', 'C. TRÂM', 'nan'],
+    ['sang2', '3', '12A5', 'ANH', 'C. KHOA', 'nan'],
+    ['sang2', '4', '12A5', 'ANH', 'C. KHOA', 'nan'],
+    ['sang2', '5', '12A5', 'ĐỊA', 'T. MINH (Đ)', 'nan'],
+    ['sang3', '1', '12A5', 'HOÁ', 'T. HUY', 'nan'],
+    ['sang3', '2', '12A5', 'HOÁ', 'T. HUY', 'nan'],
+    ['sang3', '3', '12A5', 'ANH', 'C. KHOA', 'nan'],
+    ['sang3', '4', '12A5', 'VĂN', 'C. GIANG', 'nan'],
+    ['sang3', '5', '12A5', 'GDĐP', 'C. THẢO', 'nan'],
+    ['sang4', '1', '12A5', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['sang4', '2', '12A5', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['sang4', '3', '12A5', 'ĐỊA', 'T. MINH (Đ)', 'nan'],
+    ['sang4', '4', '12A5', 'SỬ', 'C. NÊ', 'nan'],
+    ['sang4', '5', '12A5', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['sang5', '1', '12A5', 'TIN', 'C. NHÀN', 'PM5'],
+    ['sang5', '2', '12A5', 'TIN', 'C. NHÀN', 'PM5'],
+    ['sang5', '3', '12A5', 'LÝ', 'C. TRÂM', 'nan'],
+    ['sang5', '4', '12A5', 'TNHN', 'C. TRÂM', 'nan'],
+    ['sang5', '5', '12A5', 'TNHN', 'C. TRÂM', 'nan'],
+    ['sang6', '1', '12A5', 'SỬ', 'C. NÊ', 'nan'],
+    ['sang6', '2', '12A5', 'HOÁ', 'T. HUY', 'nan'],
+    ['sang6', '3', '12A5', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['sang6', '4', '12A5', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['chieu3', '2', '12A6', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['chieu3', '3', '12A6', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['chieu5', '2', '12A6', 'TOÁN', 'T. KHANG', 'nan'],
+    ['chieu5', '3', '12A6', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['chieu6', '2', '12A6', 'ĐỊA', 'T. HÒA', 'nan'],
+    ['chieu6', '3', '12A6', 'GDĐP', 'C. THẢO', 'nan'],
+    ['sang2', '1', '12A6', 'CC', 'T. KHANG', 'nan'],
+    ['sang2', '2', '12A6', 'TNHN-1', 'T. KHANG', 'nan'],
+    ['sang2', '3', '12A6', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['sang2', '4', '12A6', 'TNHN', 'T. VINH (H)', 'nan'],
+    ['sang2', '5', '12A6', 'TNHN', 'T. VINH (H)', 'nan'],
+    ['sang3', '1', '12A6', 'HOÁ', 'T. TOÀN', 'nan'],
+    ['sang3', '2', '12A6', 'ANH', 'C. TÚ', 'nan'],
+    ['sang3', '3', '12A6', 'ANH', 'C. TÚ', 'nan'],
+    ['sang3', '4', '12A6', 'LÝ', 'C. PHƯỢNG', 'nan'],
+    ['sang3', '5', '12A6', 'LÝ', 'C. PHƯỢNG', 'nan'],
+    ['sang4', '1', '12A6', 'TIN', 'C. NHÀN', 'PM5'],
+    ['sang4', '2', '12A6', 'TIN', 'C. NHÀN', 'PM5'],
+    ['sang4', '3', '12A6', 'SỬ', 'C. NÊ', 'nan'],
+    ['sang4', '4', '12A6', 'TOÁN', 'T. KHANG', 'nan'],
+    ['sang4', '5', '12A6', 'TOÁN', 'T. KHANG', 'nan'],
+    ['sang5', '1', '12A6', 'ĐỊA', 'T. HÒA', 'nan'],
+    ['sang5', '2', '12A6', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['sang5', '3', '12A6', 'LÝ', 'C. PHƯỢNG', 'nan'],
+    ['sang5', '4', '12A6', 'ANH', 'C. TÚ', 'nan'],
+    ['sang5', '5', '12A6', 'SỬ', 'C. NÊ', 'nan'],
+    ['sang6', '1', '12A6', 'TOÁN', 'T. KHANG', 'nan'],
+    ['sang6', '2', '12A6', 'TOÁN', 'T. KHANG', 'nan'],
+    ['sang6', '3', '12A6', 'HOÁ', 'T. TOÀN', 'nan'],
+    ['sang6', '4', '12A6', 'HOÁ', 'T. TOÀN', 'nan'],
+    ['chieu3', '4', '12B1', 'VĂN', 'T. TÙNG', 'nan'],
+    ['chieu3', '5', '12B1', 'VĂN', 'T. TÙNG', 'nan'],
+    ['chieu5', '4', '12B1', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['chieu5', '5', '12B1', 'SINH', 'C. LIÊM', 'nan'],
+    ['chieu6', '4', '12B1', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['chieu6', '5', '12B1', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['sang2', '1', '12B1', 'CC', 'C. LIÊM', 'nan'],
+    ['sang2', '2', '12B1', 'TNHN-1', 'C. LIÊM', 'nan'],
+    ['sang2', '3', '12B1', 'CÔNG NGHỆ', 'C. LIÊM', 'nan'],
+    ['sang2', '4', '12B1', 'TNHN', 'C. LAN (A)', 'nan'],
+    ['sang2', '5', '12B1', 'TNHN', 'C. LAN (A)', 'nan'],
+    ['sang3', '1', '12B1', 'TIN', 'C. Ý', 'PM4'],
+    ['sang3', '2', '12B1', 'TIN', 'C. Ý', 'PM4'],
+    ['sang3', '3', '12B1', 'CÔNG NGHỆ', 'C. LIÊM', 'nan'],
+    ['sang3', '4', '12B1', 'SINH', 'C. LIÊM', 'nan'],
+    ['sang3', '5', '12B1', 'SINH', 'C. LIÊM', 'nan'],
+    ['sang4', '1', '12B1', 'ANH', 'C. THỦY', 'nan'],
+    ['sang4', '2', '12B1', 'ANH', 'C. THỦY', 'nan'],
+    ['sang4', '3', '12B1', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['sang4', '4', '12B1', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['sang4', '5', '12B1', 'SỬ', 'C. NÊ', 'nan'],
+    ['sang5', '1', '12B1', 'SỬ', 'C. NÊ', 'nan'],
+    ['sang5', '2', '12B1', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['sang5', '3', '12B1', 'VĂN', 'T. TÙNG', 'nan'],
+    ['sang5', '4', '12B1', 'ANH', 'C. THỦY', 'nan'],
+    ['sang5', '5', '12B1', 'HOÁ', 'T. VINH (H)', 'nan'],
+    ['sang6', '1', '12B1', 'HOÁ', 'T. VINH (H)', 'nan'],
+    ['sang6', '2', '12B1', 'HOÁ', 'T. VINH (H)', 'nan'],
+    ['sang6', '3', '12B1', 'VĂN', 'T. TÙNG', 'nan'],
+    ['sang6', '4', '12B1', 'GDĐP', 'T. HÒA', 'nan'],
+    ['chieu3', '4', '12B2', 'TNHN', 'T. V-PHÁT', 'nan'],
+    ['chieu3', '5', '12B2', 'TNHN', 'T. V-PHÁT', 'nan'],
+    ['chieu5', '4', '12B2', 'GDQP', 'C. HUYỀN', 'nan'],
+    ['chieu5', '5', '12B2', 'HOÁ', 'T. TOÀN', 'nan'],
+    ['chieu6', '4', '12B2', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['chieu6', '5', '12B2', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['sang2', '1', '12B2', 'CC', 'T. V-PHÁT', 'nan'],
+    ['sang2', '2', '12B2', 'TNHN-1', 'T. V-PHÁT', 'nan'],
+    ['sang2', '3', '12B2', 'CÔNG NGHỆ', 'T. V-PHÁT', 'nan'],
+    ['sang2', '4', '12B2', 'TIN', 'C. Ý', 'PM5'],
+    ['sang2', '5', '12B2', 'TIN', 'C. Ý', 'PM5'],
+    ['sang3', '1', '12B2', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang3', '2', '12B2', 'SINH', 'T. V-PHÁT', 'nan'],
+    ['sang3', '3', '12B2', 'SINH', 'T. V-PHÁT', 'nan'],
+    ['sang3', '4', '12B2', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['sang3', '5', '12B2', 'CÔNG NGHỆ', 'T. V-PHÁT', 'nan'],
+    ['sang4', '1', '12B2', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang4', '2', '12B2', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang4', '3', '12B2', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['sang4', '4', '12B2', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['sang4', '5', '12B2', 'SINH', 'T. V-PHÁT', 'nan'],
+    ['sang5', '1', '12B2', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['sang5', '2', '12B2', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['sang5', '3', '12B2', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['sang5', '4', '12B2', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['sang5', '5', '12B2', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['sang6', '1', '12B2', 'HOÁ', 'T. TOÀN', 'nan'],
+    ['sang6', '2', '12B2', 'HOÁ', 'T. TOÀN', 'nan'],
+    ['sang6', '3', '12B2', 'GDĐP', 'T. HÒA', 'nan'],
+    ['sang6', '4', '12B2', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['chieu3', '4', '12C1', 'TIN', 'C. TIỀN', 'PM4'],
+    ['chieu3', '5', '12C1', 'TIN', 'C. TIỀN', 'PM4'],
+    ['chieu5', '4', '12C1', 'SINH', 'C. LIÊM', 'nan'],
+    ['chieu5', '5', '12C1', 'TOÁN', 'T. LÂM', 'nan'],
+    ['chieu6', '4', '12C1', 'TOÁN', 'T. LÂM', 'nan'],
+    ['chieu6', '5', '12C1', 'TOÁN', 'T. LÂM', 'nan'],
+    ['sang2', '1', '12C1', 'CC', 'C. NÊ', 'nan'],
+    ['sang2', '2', '12C1', 'TNHN-1', 'C. NÊ', 'nan'],
+    ['sang2', '3', '12C1', 'SỬ', 'C. NÊ', 'nan'],
+    ['sang2', '4', '12C1', 'SỬ', 'C. NÊ', 'nan'],
+    ['sang2', '5', '12C1', 'SINH', 'C. LIÊM', 'nan'],
+    ['sang3', '1', '12C1', 'VĂN', 'T. TÙNG', 'nan'],
+    ['sang3', '2', '12C1', 'VĂN', 'T. TÙNG', 'nan'],
+    ['sang3', '3', '12C1', 'KTPL', 'C. THẮM', 'nan'],
+    ['sang3', '4', '12C1', 'GDĐP', 'T. TOÀN', 'nan'],
+    ['sang3', '5', '12C1', 'ANH', 'C. KHOA', 'nan'],
+    ['sang4', '1', '12C1', 'GDQP', 'T. DŨNG', 'nan'],
+    ['sang4', '2', '12C1', 'ĐỊA', 'T. HÒA', 'nan'],
+    ['sang4', '3', '12C1', 'ĐỊA', 'T. HÒA', 'nan'],
+    ['sang4', '4', '12C1', 'KTPL', 'C. THẮM', 'nan'],
+    ['sang4', '5', '12C1', 'TOÁN', 'T. LÂM', 'nan'],
+    ['sang5', '1', '12C1', 'VĂN', 'T. TÙNG', 'nan'],
+    ['sang5', '2', '12C1', 'ANH', 'C. KHOA', 'nan'],
+    ['sang5', '3', '12C1', 'ANH', 'C. KHOA', 'nan'],
+    ['sang5', '4', '12C1', 'SỬ', 'C. NÊ', 'nan'],
+    ['sang5', '5', '12C1', 'ĐỊA', 'T. HÒA', 'nan'],
+    ['sang6', '1', '12C1', 'VĂN', 'T. TÙNG', 'nan'],
+    ['sang6', '2', '12C1', 'VĂN', 'T. TÙNG', 'nan'],
+    ['sang6', '3', '12C1', 'TNHN', 'T. HUY', 'nan'],
+    ['sang6', '4', '12C1', 'TNHN', 'T. HUY', 'nan'],
+    ['chieu3', '4', '12C2', 'VĂN', 'C. GIANG', 'nan'],
+    ['chieu3', '5', '12C2', 'VĂN', 'C. GIANG', 'nan'],
+    ['chieu5', '4', '12C2', 'GDĐP', 'T. TOÀN', 'nan'],
+    ['chieu5', '5', '12C2', 'VĂN', 'C. GIANG', 'nan'],
+    ['chieu6', '4', '12C2', 'VĂN', 'C. GIANG', 'nan'],
+    ['chieu6', '5', '12C2', 'VĂN', 'C. GIANG', 'nan'],
+    ['sang2', '1', '12C2', 'CC', 'C. TÚ', 'nan'],
+    ['sang2', '2', '12C2', 'TNHN-1', 'C. TÚ', 'nan'],
+    ['sang2', '3', '12C2', 'ĐỊA', 'C. HƯƠNG (Đ)', 'nan'],
+    ['sang2', '4', '12C2', 'ANH', 'C. TÚ', 'nan'],
+    ['sang2', '5', '12C2', 'ANH', 'C. TÚ', 'nan'],
+    ['sang3', '1', '12C2', 'SINH', 'T. V-PHÁT', 'nan'],
+    ['sang3', '2', '12C2', 'KTPL', 'C. CHI (KTPL)', 'nan'],
+    ['sang3', '3', '12C2', 'GDQP', 'T. DŨNG', 'nan'],
+    ['sang3', '4', '12C2', 'TNHN', 'C. TÚ', 'nan'],
+    ['sang3', '5', '12C2', 'TNHN', 'C. TÚ', 'nan'],
+    ['sang4', '1', '12C2', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['sang4', '2', '12C2', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['sang4', '3', '12C2', 'SINH', 'T. V-PHÁT', 'nan'],
+    ['sang4', '4', '12C2', 'TOÁN', 'C. DUNG', 'nan'],
+    ['sang4', '5', '12C2', 'TOÁN', 'C. DUNG', 'nan'],
+    ['sang5', '1', '12C2', 'ĐỊA', 'C. HƯƠNG (Đ)', 'nan'],
+    ['sang5', '2', '12C2', 'ĐỊA', 'C. HƯƠNG (Đ)', 'nan'],
+    ['sang5', '3', '12C2', 'ANH', 'C. TÚ', 'nan'],
+    ['sang5', '4', '12C2', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['sang5', '5', '12C2', 'TOÁN', 'C. DUNG', 'nan'],
+    ['sang6', '1', '12C2', 'TOÁN', 'C. DUNG', 'nan'],
+    ['sang6', '2', '12C2', 'KTPL', 'C. CHI (KTPL)', 'nan'],
+    ['sang6', '3', '12C2', 'TIN', 'C. NGÂN (TI)', 'PM4'],
+    ['sang6', '4', '12C2', 'TIN', 'C. NGÂN (TI)', 'PM4'],
+    ['chieu3', '4', '12Đ', 'KTPL', 'C. THẮM', 'nan'],
+    ['chieu3', '5', '12Đ', 'CÔNG NGHỆ', 'T. T-PHÁT', 'nan'],
+    ['chieu5', '4', '12Đ', 'TOÁN', 'T. THU', 'nan'],
+    ['chieu5', '5', '12Đ', 'CÔNG NGHỆ', 'T. T-PHÁT', 'nan'],
+    ['chieu6', '4', '12Đ', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['chieu6', '5', '12Đ', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['sang2', '1', '12Đ', 'CC', 'C. TRANG (V)', 'nan'],
+    ['sang2', '2', '12Đ', 'TNHN-1', 'C. TRANG (V)', 'nan'],
+    ['sang2', '3', '12Đ', 'ĐỊA', 'T. MINH (Đ)', 'nan'],
+    ['sang2', '4', '12Đ', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['sang2', '5', '12Đ', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['sang3', '1', '12Đ', 'VĂN', 'C. TRANG (V)', 'nan'],
+    ['sang3', '2', '12Đ', 'TNHN', 'C. TRANG (V)', 'nan'],
+    ['sang3', '3', '12Đ', 'TNHN', 'C. TRANG (V)', 'nan'],
+    ['sang3', '4', '12Đ', 'TIN', 'C. NGÂN (TI)', 'PM5'],
+    ['sang3', '5', '12Đ', 'TIN', 'C. NGÂN (TI)', 'PM5'],
+    ['sang4', '1', '12Đ', 'ĐỊA', 'T. MINH (Đ)', 'nan'],
+    ['sang4', '2', '12Đ', 'ĐỊA', 'T. MINH (Đ)', 'nan'],
+    ['sang4', '3', '12Đ', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang4', '4', '12Đ', 'TOÁN', 'T. THU', 'nan'],
+    ['sang4', '5', '12Đ', 'GDQP', 'T. DŨNG', 'nan'],
+    ['sang5', '1', '12Đ', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['sang5', '2', '12Đ', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['sang5', '3', '12Đ', 'GDĐP', 'T. HÒA', 'nan'],
+    ['sang5', '4', '12Đ', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang5', '5', '12Đ', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang6', '1', '12Đ', 'TOÁN', 'T. THU', 'nan'],
+    ['sang6', '2', '12Đ', 'TOÁN', 'T. THU', 'nan'],
+    ['sang6', '3', '12Đ', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['sang6', '4', '12Đ', 'KTPL', 'C. THẮM', 'nan'],
+    ['chieu4', '4', '12H1', 'TIN', 'C. TIỀN', 'PM5'],
+    ['chieu4', '5', '12H1', 'TIN', 'C. TIỀN', 'PM5'],
+    ['chieu5', '4', '12H1', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['chieu5', '5', '12H1', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['chieu6', '4', '12H1', 'HOÁ', 'C. THƯ', 'nan'],
+    ['chieu6', '5', '12H1', 'HOÁ', 'C. THƯ', 'nan'],
+    ['sang2', '1', '12H1', 'CC', 'C. THƯ', 'nan'],
+    ['sang2', '2', '12H1', 'TNHN-1', 'C. THƯ', 'nan'],
+    ['sang2', '3', '12H1', 'HOÁ', 'C. THƯ', 'nan'],
+    ['sang2', '4', '12H1', 'KTPL', 'C. CHÂU', 'nan'],
+    ['sang2', '5', '12H1', 'GDĐP', 'T. TOÀN', 'nan'],
+    ['sang3', '1', '12H1', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['sang3', '2', '12H1', 'ANH', 'C. TÂM (A)', 'nan'],
+    ['sang3', '3', '12H1', 'VĂN', 'C. ÁNH', 'nan'],
+    ['sang3', '4', '12H1', 'TNHN', 'T. LUÂN', 'nan'],
+    ['sang3', '5', '12H1', 'TNHN', 'T. LUÂN', 'nan'],
+    ['sang4', '1', '12H1', 'ĐỊA', 'C. HƯƠNG (Đ)', 'nan'],
+    ['sang4', '2', '12H1', 'GDQP', 'T. DŨNG', 'nan'],
+    ['sang4', '3', '12H1', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['sang4', '4', '12H1', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['sang4', '5', '12H1', 'KTPL', 'C. CHÂU', 'nan'],
+    ['sang5', '1', '12H1', 'VĂN', 'C. ÁNH', 'nan'],
+    ['sang5', '2', '12H1', 'VĂN', 'C. ÁNH', 'nan'],
+    ['sang5', '3', '12H1', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['sang5', '4', '12H1', 'ĐỊA', 'C. HƯƠNG (Đ)', 'nan'],
+    ['sang5', '5', '12H1', 'ĐỊA', 'C. HƯƠNG (Đ)', 'nan'],
+    ['sang6', '1', '12H1', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['sang6', '2', '12H1', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['sang6', '3', '12H1', 'VĂN', 'C. ÁNH', 'nan'],
+    ['sang6', '4', '12H1', 'SỬ', 'C. HẠNH (S)', 'nan'],
+    ['chieu4', '4', '12H2', 'KTPL', 'C. CHÂU', 'nan'],
+    ['chieu4', '5', '12H2', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['chieu5', '4', '12H2', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['chieu5', '5', '12H2', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['chieu6', '4', '12H2', 'SỬ', 'T. THÀNH', 'nan'],
+    ['chieu6', '5', '12H2', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['sang2', '1', '12H2', 'CC', 'T. MINH (Đ)', 'nan'],
+    ['sang2', '2', '12H2', 'TNHN-1', 'T. MINH (Đ)', 'nan'],
+    ['sang2', '3', '12H2', 'HOÁ', 'T. LUÂN', 'nan'],
+    ['sang2', '4', '12H2', 'HOÁ', 'T. LUÂN', 'nan'],
+    ['sang2', '5', '12H2', 'KTPL', 'C. CHÂU', 'nan'],
+    ['sang3', '1', '12H2', 'HOÁ', 'T. LUÂN', 'nan'],
+    ['sang3', '2', '12H2', 'GDQP', 'T. DŨNG', 'nan'],
+    ['sang3', '3', '12H2', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['sang3', '4', '12H2', 'TNHN', 'C. LAN (L)', 'nan'],
+    ['sang3', '5', '12H2', 'TNHN', 'C. LAN (L)', 'nan'],
+    ['sang4', '1', '12H2', 'TIN', 'C. NGÂN (TI)', 'PM2'],
+    ['sang4', '2', '12H2', 'TIN', 'C. NGÂN (TI)', 'PM2'],
+    ['sang4', '3', '12H2', 'ANH', 'C. TRINH', 'nan'],
+    ['sang4', '4', '12H2', 'ANH', 'C. TRINH', 'nan'],
+    ['sang4', '5', '12H2', 'SỬ', 'T. THÀNH', 'nan'],
+    ['sang5', '1', '12H2', 'ĐỊA', 'T. MINH (Đ)', 'nan'],
+    ['sang5', '2', '12H2', 'GDĐP', 'T. MINH (Đ)', 'nan'],
+    ['sang5', '3', '12H2', 'ANH', 'C. TRINH', 'nan'],
+    ['sang5', '4', '12H2', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['sang5', '5', '12H2', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['sang6', '1', '12H2', 'ĐỊA', 'T. MINH (Đ)', 'nan'],
+    ['sang6', '2', '12H2', 'ĐỊA', 'T. MINH (Đ)', 'nan'],
+    ['sang6', '3', '12H2', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['sang6', '4', '12H2', 'TOÁN', 'T. D-MINH', 'nan'],
+    ['chieu3', '2', '12L1', 'CÔNG NGHỆ', 'T. SƠN', 'nan'],
+    ['chieu3', '3', '12L1', 'ANH', 'C. MAI', 'nan'],
+    ['chieu5', '2', '12L1', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['chieu5', '3', '12L1', 'SỬ', 'T. THÀNH', 'nan'],
+    ['chieu6', '2', '12L1', 'TIN', 'T. HẢO', 'PM4'],
+    ['chieu6', '3', '12L1', 'KTPL', 'C. CHI (KTPL)', 'nan'],
+    ['sang2', '1', '12L1', 'CC', 'C. HƯƠNG (V)', 'nan'],
+    ['sang2', '2', '12L1', 'TNHN-1', 'C. HƯƠNG (V)', 'nan'],
+    ['sang2', '3', '12L1', 'TIN', 'T. HẢO', 'PM1'],
+    ['sang2', '4', '12L1', 'TIN', 'T. HẢO', 'PM1'],
+    ['sang2', '5', '12L1', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['sang3', '1', '12L1', 'TNHN', 'C. THẮM', 'nan'],
+    ['sang3', '2', '12L1', 'TNHN', 'C. THẮM', 'nan'],
+    ['sang3', '3', '12L1', 'KTPL', 'C. CHI (KTPL)', 'nan'],
+    ['sang3', '4', '12L1', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['sang3', '5', '12L1', 'VĂN', 'C. HƯƠNG (V)', 'nan'],
+    ['sang4', '1', '12L1', 'ANH', 'C. MAI', 'nan'],
+    ['sang4', '2', '12L1', 'ANH', 'C. MAI', 'nan'],
+    ['sang4', '3', '12L1', 'GDQP', 'T. DŨNG', 'nan'],
+    ['sang4', '4', '12L1', 'SỬ', 'T. THÀNH', 'nan'],
+    ['sang4', '5', '12L1', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['sang5', '1', '12L1', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['sang5', '2', '12L1', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['sang5', '3', '12L1', 'GDĐP', 'T. MINH (Đ)', 'nan'],
+    ['sang5', '4', '12L1', 'LÝ', 'C. LAN (L)', 'nan'],
+    ['sang5', '5', '12L1', 'LÝ', 'C. LAN (L)', 'nan'],
+    ['sang6', '1', '12L1', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['sang6', '2', '12L1', 'TOÁN', 'T. PHƯỚC', 'nan'],
+    ['sang6', '3', '12L1', 'CÔNG NGHỆ', 'T. SƠN', 'nan'],
+    ['sang6', '4', '12L1', 'LÝ', 'C. LAN (L)', 'nan'],
+    ['chieu3', '2', '12L2', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['chieu3', '3', '12L2', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['chieu5', '2', '12L2', 'TOÁN', 'T. LÂM', 'nan'],
+    ['chieu5', '3', '12L2', 'TOÁN', 'T. LÂM', 'nan'],
+    ['chieu6', '2', '12L2', 'KTPL', 'C. CHI (KTPL)', 'nan'],
+    ['chieu6', '3', '12L2', 'TIN', 'T. HẢO', 'PM4'],
+    ['sang2', '1', '12L2', 'CC', 'T. LÂM', 'nan'],
+    ['sang2', '2', '12L2', 'TNHN-1', 'T. LÂM', 'nan'],
+    ['sang2', '3', '12L2', 'TOÁN', 'T. LÂM', 'nan'],
+    ['sang2', '4', '12L2', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['sang2', '5', '12L2', 'SỬ', 'T. THÀNH', 'nan'],
+    ['sang3', '1', '12L2', 'TIN', 'T. HẢO', 'PM1'],
+    ['sang3', '2', '12L2', 'TIN', 'T. HẢO', 'PM1'],
+    ['sang3', '3', '12L2', 'CÔNG NGHỆ', 'T. SƠN', 'nan'],
+    ['sang3', '4', '12L2', 'KTPL', 'C. CHI (KTPL)', 'nan'],
+    ['sang3', '5', '12L2', 'GDĐP', 'T. TOÀN', 'nan'],
+    ['sang4', '1', '12L2', 'TOÁN', 'T. LÂM', 'nan'],
+    ['sang4', '2', '12L2', 'TOÁN', 'T. LÂM', 'nan'],
+    ['sang4', '3', '12L2', 'SỬ', 'T. THÀNH', 'nan'],
+    ['sang4', '4', '12L2', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['sang4', '5', '12L2', 'ANH', 'C. THỦY', 'nan'],
+    ['sang5', '1', '12L2', 'ANH', 'C. THỦY', 'nan'],
+    ['sang5', '2', '12L2', 'ANH', 'C. THỦY', 'nan'],
+    ['sang5', '3', '12L2', 'LÝ', 'C. GIANG (L)', 'nan'],
+    ['sang5', '4', '12L2', 'TNHN', 'T. HUY', 'nan'],
+    ['sang5', '5', '12L2', 'TNHN', 'T. HUY', 'nan'],
+    ['sang6', '1', '12L2', 'VĂN', 'C. HOA (V)', 'nan'],
+    ['sang6', '2', '12L2', 'CÔNG NGHỆ', 'T. SƠN', 'nan'],
+    ['sang6', '3', '12L2', 'LÝ', 'C. GIANG (L)', 'nan'],
+    ['sang6', '4', '12L2', 'LÝ', 'C. GIANG (L)', 'nan'],
+    ['chieu3', '2', '12L3', 'KTPL', 'C. THẮM', 'nan'],
+    ['chieu3', '3', '12L3', 'VĂN', 'T. TÙNG', 'nan'],
+    ['chieu5', '2', '12L3', 'SỬ', 'T. THÀNH', 'nan'],
+    ['chieu5', '3', '12L3', 'TOÁN', 'T. KHANG', 'nan'],
+    ['chieu6', '2', '12L3', 'SỬ', 'T. THÀNH', 'nan'],
+    ['chieu6', '3', '12L3', 'VĂN', 'T. TÙNG', 'nan'],
+    ['sang2', '1', '12L3', 'CC', 'C. TÂM (L)', 'nan'],
+    ['sang2', '2', '12L3', 'TNHN-1', 'C. TÂM (L)', 'nan'],
+    ['sang2', '3', '12L3', 'LÝ', 'C. TÂM (L)', 'nan'],
+    ['sang2', '4', '12L3', 'GDĐP', 'T. TOÀN', 'nan'],
+    ['sang2', '5', '12L3', 'TIN', 'T. HẢO', 'PM1'],
+    ['sang3', '1', '12L3', 'CÔNG NGHỆ', 'T. SƠN', 'nan'],
+    ['sang3', '2', '12L3', 'LÝ', 'C. TÂM (L)', 'nan'],
+    ['sang3', '3', '12L3', 'LÝ', 'C. TÂM (L)', 'nan'],
+    ['sang3', '4', '12L3', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang3', '5', '12L3', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang4', '1', '12L3', 'TOÁN', 'T. KHANG', 'nan'],
+    ['sang4', '2', '12L3', 'TOÁN', 'T. KHANG', 'nan'],
+    ['sang4', '3', '12L3', 'TIN', 'T. HẢO', 'PM4'],
+    ['sang4', '4', '12L3', 'TIN', 'T. HẢO', 'PM4'],
+    ['sang4', '5', '12L3', 'KTPL', 'C. THẮM', 'nan'],
+    ['sang5', '1', '12L3', 'TNHN', 'C. TÂM (L)', 'nan'],
+    ['sang5', '2', '12L3', 'TNHN', 'C. TÂM (L)', 'nan'],
+    ['sang5', '3', '12L3', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang5', '4', '12L3', 'VĂN', 'T. TÙNG', 'nan'],
+    ['sang5', '5', '12L3', 'VĂN', 'T. TÙNG', 'nan'],
+    ['sang6', '1', '12L3', 'CÔNG NGHỆ', 'T. SƠN', 'nan'],
+    ['sang6', '2', '12L3', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['sang6', '3', '12L3', 'TOÁN', 'T. KHANG', 'nan'],
+    ['sang6', '4', '12L3', 'TOÁN', 'T. KHANG', 'nan'],
+    ['chieu3', '2', '12L4', 'TNHN', 'T. HUY', 'nan'],
+    ['chieu3', '3', '12L4', 'TNHN', 'T. HUY', 'nan'],
+    ['chieu5', '2', '12L4', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['chieu5', '3', '12L4', 'VĂN', 'C. GIANG', 'nan'],
+    ['chieu6', '2', '12L4', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['chieu6', '3', '12L4', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['sang2', '1', '12L4', 'CC', 'C. KHOA', 'nan'],
+    ['sang2', '2', '12L4', 'TNHN-1', 'C. KHOA', 'nan'],
+    ['sang2', '3', '12L4', 'SỬ', 'T. THÀNH', 'nan'],
+    ['sang2', '4', '12L4', 'CÔNG NGHỆ', 'T. SƠN', 'nan'],
+    ['sang2', '5', '12L4', 'ANH', 'C. KHOA', 'nan'],
+    ['sang3', '1', '12L4', 'KTPL', 'C. CHI (KTPL)', 'nan'],
+    ['sang3', '2', '12L4', 'LÝ', 'C. PHƯỢNG', 'nan'],
+    ['sang3', '3', '12L4', 'TIN', 'C. NHÀN', 'PM1'],
+    ['sang3', '4', '12L4', 'TIN', 'C. NHÀN', 'PM1'],
+    ['sang3', '5', '12L4', 'VĂN', 'C. GIANG', 'nan'],
+    ['sang4', '1', '12L4', 'SỬ', 'T. THÀNH', 'nan'],
+    ['sang4', '2', '12L4', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['sang4', '3', '12L4', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['sang4', '4', '12L4', 'TOÁN', 'T. Q-MINH', 'nan'],
+    ['sang4', '5', '12L4', 'GDĐP', 'T. HÒA', 'nan'],
+    ['sang5', '1', '12L4', 'LÝ', 'C. PHƯỢNG', 'nan'],
+    ['sang5', '2', '12L4', 'LÝ', 'C. PHƯỢNG', 'nan'],
+    ['sang5', '3', '12L4', 'TIN', 'C. NHÀN', 'PM5'],
+    ['sang5', '4', '12L4', 'ANH', 'C. KHOA', 'nan'],
+    ['sang5', '5', '12L4', 'ANH', 'C. KHOA', 'nan'],
+    ['sang6', '1', '12L4', 'VĂN', 'C. GIANG', 'nan'],
+    ['sang6', '2', '12L4', 'VĂN', 'C. GIANG', 'nan'],
+    ['sang6', '3', '12L4', 'KTPL', 'C. CHI (KTPL)', 'nan'],
+    ['sang6', '4', '12L4', 'CÔNG NGHỆ', 'T. SƠN', 'nan'],
+    ['chieu4', '4', '12L5', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['chieu4', '5', '12L5', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['chieu5', '4', '12L5', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['chieu5', '5', '12L5', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['chieu6', '4', '12L5', 'KTPL', 'C. THẮM', 'nan'],
+    ['chieu6', '5', '12L5', 'SỬ', 'T. THÀNH', 'nan'],
+    ['sang2', '1', '12L5', 'CC', 'C. PHƯỢNG', 'nan'],
+    ['sang2', '2', '12L5', 'TNHN-1', 'C. PHƯỢNG', 'nan'],
+    ['sang2', '3', '12L5', 'VĂN', 'C. THẢO', 'nan'],
+    ['sang2', '4', '12L5', 'VĂN', 'C. THẢO', 'nan'],
+    ['sang2', '5', '12L5', 'CÔNG NGHỆ', 'T. SƠN', 'nan'],
+    ['sang3', '1', '12L5', 'LÝ', 'C. PHƯỢNG', 'nan'],
+    ['sang3', '2', '12L5', 'GDĐP', 'T. TOÀN', 'nan'],
+    ['sang3', '3', '12L5', 'VĂN', 'C. THẢO', 'nan'],
+    ['sang3', '4', '12L5', 'CÔNG NGHỆ', 'T. SƠN', 'nan'],
+    ['sang3', '5', '12L5', 'TIN', 'C. NHÀN', 'PM1'],
+    ['sang4', '1', '12L5', 'ANH', 'C. TRINH', 'nan'],
+    ['sang4', '2', '12L5', 'SỬ', 'T. THÀNH', 'nan'],
+    ['sang4', '3', '12L5', 'KTPL', 'C. THẮM', 'nan'],
+    ['sang4', '4', '12L5', 'TIN', 'C. NHÀN', 'PM5'],
+    ['sang4', '5', '12L5', 'TIN', 'C. NHÀN', 'PM5'],
+    ['sang5', '1', '12L5', 'ANH', 'C. TRINH', 'nan'],
+    ['sang5', '2', '12L5', 'ANH', 'C. TRINH', 'nan'],
+    ['sang5', '3', '12L5', 'VĂN', 'C. THẢO', 'nan'],
+    ['sang5', '4', '12L5', 'TNHN', 'C. PHƯỢNG', 'nan'],
+    ['sang5', '5', '12L5', 'TNHN', 'C. PHƯỢNG', 'nan'],
+    ['sang6', '1', '12L5', 'LÝ', 'C. PHƯỢNG', 'nan'],
+    ['sang6', '2', '12L5', 'LÝ', 'C. PHƯỢNG', 'nan'],
+    ['sang6', '3', '12L5', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['sang6', '4', '12L5', 'TOÁN', 'C. LAN (T)', 'nan'],
+    ['chieu4', '4', '12L6', 'SỬ', 'T. THÀNH', 'nan'],
+    ['chieu4', '5', '12L6', 'KTPL', 'C. CHÂU', 'nan'],
+    ['chieu5', '4', '12L6', 'SỬ', 'T. THÀNH', 'nan'],
+    ['chieu5', '5', '12L6', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['chieu6', '4', '12L6', 'GDQP', 'T. VINH (QP)', 'nan'],
+    ['chieu6', '5', '12L6', 'CÔNG NGHỆ', 'T. SƠN', 'nan'],
+    ['sang2', '1', '12L6', 'CC', 'C. ÁNH', 'nan'],
+    ['sang2', '2', '12L6', 'TNHN-1', 'C. ÁNH', 'nan'],
+    ['sang2', '3', '12L6', 'GDĐP', 'T. TOÀN', 'nan'],
+    ['sang2', '4', '12L6', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['sang2', '5', '12L6', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['sang3', '1', '12L6', 'LÝ', 'C. HỒNG (L)', 'nan'],
+    ['sang3', '2', '12L6', 'CÔNG NGHỆ', 'T. SƠN', 'nan'],
+    ['sang3', '3', '12L6', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang3', '4', '12L6', 'VĂN', 'C. ÁNH', 'nan'],
+    ['sang3', '5', '12L6', 'VĂN', 'C. ÁNH', 'nan'],
+    ['sang4', '1', '12L6', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['sang4', '2', '12L6', 'TOÁN', 'T. VINH (T)', 'nan'],
+    ['sang4', '3', '12L6', 'TIN', 'C. NHÀN', 'PM5'],
+    ['sang4', '4', '12L6', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang4', '5', '12L6', 'ANH', 'C. LAN (A)', 'nan'],
+    ['sang5', '1', '12L6', 'LÝ', 'C. HỒNG (L)', 'nan'],
+    ['sang5', '2', '12L6', 'LÝ', 'C. HỒNG (L)', 'nan'],
+    ['sang5', '3', '12L6', 'VĂN', 'C. ÁNH', 'nan'],
+    ['sang5', '4', '12L6', 'TIN', 'C. NHÀN', 'PM5'],
+    ['sang5', '5', '12L6', 'TIN', 'C. NHÀN', 'PM5'],
+    ['sang6', '1', '12L6', 'VĂN', 'C. ÁNH', 'nan'],
+    ['sang6', '2', '12L6', 'TNHN', 'C. THẮM', 'nan'],
+    ['sang6', '3', '12L6', 'TNHN', 'C. THẮM', 'nan'],
+    ['sang6', '4', '12L6', 'KTPL', 'C. CHÂU', 'nan']
+
+        ];
+
+        // Initialize with sample data
+        loadData(sampleData);
+        
+        // Auto-load data from Google Drive
+        loadDataFromGoogleDrive();
+
+        // Display mode toggle functionality
+        document.getElementById('fullModeBtn').addEventListener('click', function() {
+            displayMode = 'full';
+            this.classList.add('bg-blue-500', 'text-white');
+            this.classList.remove('text-gray-600', 'hover:bg-gray-200');
+            document.getElementById('compactModeBtn').classList.remove('bg-blue-500', 'text-white');
+            document.getElementById('compactModeBtn').classList.add('text-gray-600', 'hover:bg-gray-200');
+            
+            // Refresh current schedule if one is displayed
+            refreshCurrentSchedule();
+        });
+
+        document.getElementById('compactModeBtn').addEventListener('click', function() {
+            displayMode = 'compact';
+            this.classList.add('bg-blue-500', 'text-white');
+            this.classList.remove('text-gray-600', 'hover:bg-gray-200');
+            document.getElementById('fullModeBtn').classList.remove('bg-blue-500', 'text-white');
+            document.getElementById('fullModeBtn').classList.add('text-gray-600', 'hover:bg-gray-200');
+            
+            // Refresh current schedule if one is displayed
+            refreshCurrentSchedule();
+        });
+
+        function refreshCurrentSchedule() {
+            const classSelect = document.getElementById('classSelect');
+            const teacherSelect = document.getElementById('teacherSelect');
+            
+            if (classSelect.value) {
+                displaySchedule(classSelect.value, 'class');
+            } else if (teacherSelect.value) {
+                displaySchedule(teacherSelect.value, 'teacher');
+            }
+        }
+
+        // Selection functionality
+        document.getElementById('classSelect').addEventListener('change', function() {
+            const selectedClass = this.value;
+            if (selectedClass) {
+                // Clear teacher selection when class is selected
+                document.getElementById('teacherSelect').value = '';
+                displaySchedule(selectedClass, 'class');
+            } else {
+                document.getElementById('scheduleContainer').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('teacherSelect').addEventListener('change', function() {
+            const selectedTeacher = this.value;
+            if (selectedTeacher) {
+                // Clear class selection when teacher is selected
+                document.getElementById('classSelect').value = '';
+                displaySchedule(selectedTeacher, 'teacher');
+            } else {
+                document.getElementById('scheduleContainer').classList.add('hidden');
+            }
+        });
+
+        // File upload handler
+        document.getElementById('csvFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const csv = e.target.result;
+                    const lines = csv.split('\n').filter(line => line.trim());
+                    const data = lines.map(line => {
+                        const result = [];
+                        let current = '';
+                        let inQuotes = false;
+                        
+                        for (let i = 0; i < line.length; i++) {
+                            const char = line[i];
+                            if (char === '"') {
+                                inQuotes = !inQuotes;
+                            } else if (char === ',' && !inQuotes) {
+                                result.push(current.trim());
+                                current = '';
+                            } else {
+                                current += char;
+                            }
+                        }
+                        result.push(current.trim());
+                        return result;
+                    });
+                    loadData(data);
+                };
+                reader.readAsText(file, 'utf-8');
+            }
+        });
+
+        function loadDataFromGoogleDrive() {
+            // Convert Google Drive sharing link to direct download link
+            const fileId = '1-le5q70sJX3IgIykF1GKO_d6bqZQ4Qnn';
+            const directUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+            
+            fetch(directUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(csvText => {
+                    const lines = csvText.split('\n').filter(line => line.trim());
+                    const data = lines.map(line => {
+                        const result = [];
+                        let current = '';
+                        let inQuotes = false;
+                        
+                        for (let i = 0; i < line.length; i++) {
+                            const char = line[i];
+                            if (char === '"') {
+                                inQuotes = !inQuotes;
+                            } else if (char === ',' && !inQuotes) {
+                                result.push(current.trim());
+                                current = '';
+                            } else {
+                                current += char;
+                            }
+                        }
+                        result.push(current.trim());
+                        return result;
+                    });
+                    
+                    // Load the data from Google Drive
+                    loadData(data);
+                    console.log('Đã tải dữ liệu từ Google Drive thành công!');
+                    
+                    // Update loading status
+                    const loadingStatus = document.getElementById('loadingStatus');
+                    loadingStatus.innerHTML = `
+                        <div class="inline-flex items-center text-green-600 text-sm">
+                            <svg class="mr-2 h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Đã tải dữ liệu từ Google Drive thành công!
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Lỗi khi tải dữ liệu từ Google Drive:', error);
+                    console.log('Sử dụng dữ liệu mẫu thay thế');
+                    
+                    // Update loading status with error
+                    const loadingStatus = document.getElementById('loadingStatus');
+                    loadingStatus.innerHTML = `
+                        <div class="inline-flex items-center text-orange-600 text-sm">
+                            <svg class="mr-2 h-4 w-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                            Sử dụng dữ liệu mẫu (không thể tải từ Google Drive)
+                        </div>
+                    `;
+                    // Keep using sample data if Google Drive fails
+                });
+        }
+
+        function loadData(data) {
+            scheduleData = data;
+            classes.clear();
+            teachers.clear();
+            
+            data.forEach(row => {
+                if (row[2]) classes.add(row[2]);
+                if (row[4]) teachers.add(row[4]);
+            });
+
+            const classSelect = document.getElementById('classSelect');
+            classSelect.innerHTML = '<option value="">-- Chọn lớp --</option>';
+            
+            Array.from(classes).sort().forEach(className => {
+                const option = document.createElement('option');
+                option.value = className;
+                option.textContent = className;
+                classSelect.appendChild(option);
+            });
+
+            const teacherSelect = document.getElementById('teacherSelect');
+            teacherSelect.innerHTML = '<option value="" class="text-gray-800">-- Chọn giáo viên --</option>';
+            
+            Array.from(teachers).sort().forEach(teacherName => {
+                const option = document.createElement('option');
+                option.value = teacherName;
+                option.textContent = teacherName;
+                teacherSelect.appendChild(option);
+            });
+        }
+
+
+
+        function displaySchedule(selectedValue, mode) {
+            let filteredData;
+            let displayTitle;
+            
+            if (mode === 'class') {
+                filteredData = scheduleData.filter(row => row[2] === selectedValue);
+                displayTitle = `Lớp ${selectedValue}`;
+            } else {
+                filteredData = scheduleData.filter(row => row[4] === selectedValue);
+                displayTitle = `${selectedValue}`;
+            }
+
+            const schedule = {};
+            
+            for (let period = 1; period <= 10; period++) {
+                schedule[period] = {};
+                for (let day = 2; day <= 7; day++) {
+                    schedule[period][day] = null;
+                }
+            }
+
+            filteredData.forEach(row => {
+                const [session, period, , subject, teacher, room] = row;
+                if (session && period && subject) {
+                    const dayMatch = session.match(/(\d+)$/);
+                    if (dayMatch) {
+                        const day = parseInt(dayMatch[1]);
+                        if (day >= 2 && day <= 7) {
+                            const lessonData = {
+                                subject: subject,
+                                teacher: teacher || '',
+                                room: room || '',
+                                class: row[2] || '',
+                                session: session
+                            };
+                            
+                            let adjustedPeriod = parseInt(period);
+                            if (session.startsWith('chieu')) {
+                                adjustedPeriod += 5;
+                            }
+                            
+                            schedule[adjustedPeriod][day] = lessonData;
+                        }
+                    }
+                }
+            });
+
+            const activeDays = new Set();
+            const activePeriods = new Set();
+            
+            for (let period = 1; period <= 10; period++) {
+                for (let day = 2; day <= 7; day++) {
+                    if (schedule[period][day]) {
+                        activeDays.add(day);
+                        activePeriods.add(period);
+                    }
+                }
+            }
+
+            const dayNames = {2: 'Thứ 2', 3: 'Thứ 3', 4: 'Thứ 4', 5: 'Thứ 5', 6: 'Thứ 6', 7: 'Thứ 7'};
+            
+            const tableHeader = document.querySelector('#scheduleContainer table thead tr');
+            const headerPadding = displayMode === 'compact' ? 'p-2' : 'p-3';
+            const headerSize = displayMode === 'compact' ? 'text-sm' : '';
+            tableHeader.innerHTML = `<th class="${headerPadding} text-left font-semibold text-gray-800 border-r border-gray-200 ${headerSize}">Tiết</th>`;
+            Array.from(activeDays).sort().forEach(day => {
+                const isLast = day === Math.max(...Array.from(activeDays));
+                const borderClass = isLast ? '' : 'border-r border-gray-200';
+                tableHeader.innerHTML += `<th class="${headerPadding} text-center font-semibold text-gray-800 ${borderClass} ${headerSize}">${dayNames[day]}</th>`;
+            });
+
+            const tableBody = document.getElementById('scheduleTable');
+            tableBody.innerHTML = '';
+
+            Array.from(activePeriods).sort((a, b) => a - b).forEach(period => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-200 hover:bg-gray-50 transition-colors';
+                
+                const periodCell = document.createElement('td');
+                const isMorning = period <= 5;
+                const displayPeriod = isMorning ? period : period - 5;
+                const sessionLabel = isMorning ? 'Sáng' : 'Chiều';
+                const sessionColor = isMorning ? 'text-orange-500' : 'text-green-500';
+                
+                if (displayMode === 'compact') {
+                    periodCell.className = 'p-2 font-semibold text-center border-r border-gray-200 w-16';
+                    periodCell.innerHTML = `
+                        <div class="text-gray-800 text-base">${displayPeriod}</div>
+                        <div class="text-xs ${sessionColor}">${sessionLabel}</div>
+                    `;
+                } else {
+                    periodCell.className = 'p-3 font-semibold text-center border-r border-gray-200';
+                    periodCell.innerHTML = `
+                        <div class="text-gray-800 text-lg">${displayPeriod}</div>
+                        <div class="text-xs ${sessionColor}">${sessionLabel}</div>
+                    `;
+                }
+                row.appendChild(periodCell);
+
+                Array.from(activeDays).sort().forEach(day => {
+                    const cell = document.createElement('td');
+                    const isLast = day === Math.max(...Array.from(activeDays));
+                    const borderClass = isLast ? '' : 'border-r border-gray-200';
+                    const paddingClass = displayMode === 'compact' ? 'p-2' : 'p-3';
+                    cell.className = `${paddingClass} text-center ${borderClass}`;
+                    
+                    const lesson = schedule[period][day];
+                    if (lesson) {
+                        const isMorning = period <= 5;
+                        const bgColor = isMorning ? 'bg-orange-50' : 'bg-green-50';
+                        const borderColor = isMorning ? 'border-orange-200' : 'border-green-200';
+                        
+                        if (displayMode === 'compact') {
+                            // Compact mode: show only subject for class view, only class for teacher view
+                            const compactInfo = mode === 'teacher' ? lesson.class : lesson.subject;
+                            cell.innerHTML = `
+                                <div class="${bgColor} ${borderColor} border rounded-lg p-2">
+                                    <div class="font-semibold text-gray-800 text-sm text-center">${compactInfo}</div>
+                                </div>
+                            `;
+                        } else {
+                            // Full mode: show all information
+                            const displayInfo = mode === 'teacher' ? lesson.class : lesson.teacher;
+                            cell.innerHTML = `
+                                <div class="${bgColor} ${borderColor} border rounded-xl p-3">
+                                    <div class="font-semibold text-gray-800 text-sm mb-1">${lesson.subject}</div>
+                                    <div class="text-xs text-gray-600">${displayInfo}</div>
+                                    <div class="text-xs text-gray-500 mt-1">${lesson.room}</div>
+                                </div>
+                            `;
+                        }
+                    } else {
+                        cell.innerHTML = '<div class="text-gray-400 text-sm">—</div>';
+                    }
+                    
+                    row.appendChild(cell);
+                });
+                
+                tableBody.appendChild(row);
+            });
+
+            document.getElementById('selectedItem').textContent = displayTitle;
+            document.getElementById('scheduleContainer').classList.remove('hidden');
+        }
+
+        // Drag and drop functionality
+        const dropZone = document.querySelector('.border-dashed');
+        
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('border-blue-400', 'bg-blue-50');
+        });
+
+        dropZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('border-blue-400', 'bg-blue-50');
+        });
+
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('border-blue-400', 'bg-blue-50');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('csvFile').files = files;
+                document.getElementById('csvFile').dispatchEvent(new Event('change'));
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'978d843d5152107e',t:'MTc1NjgyMTQ0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
